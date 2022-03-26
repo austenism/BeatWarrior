@@ -156,11 +156,11 @@ namespace Gaming
             {
                 Attacking = false;
                 currentKeyboardState = Keyboard.GetState();
-                if (currentKeyboardState.IsKeyDown(Keys.D) && priorKeyboardState.IsKeyUp(Keys.D))
+                if (currentKeyboardState.IsKeyDown(Keys.D) && priorKeyboardState.IsKeyUp(Keys.D) && !movedThisBeat)
                 {
                     lastInput = 3;
                     facingLeft = false;
-                    if (Position.X < 11 && !ObstacleRight)
+                    if (Position.X < 11 && !ObstacleRight && canMove)
                     {
                         Position.X = Position.X + 1;
                         canMove = false;
@@ -168,7 +168,7 @@ namespace Gaming
                         movedThisBeat = true;
                     }
                 }
-                if (currentKeyboardState.IsKeyDown(Keys.S) && priorKeyboardState.IsKeyUp(Keys.S))
+                if (currentKeyboardState.IsKeyDown(Keys.S) && priorKeyboardState.IsKeyUp(Keys.S) && !movedThisBeat)
                 {
                     facingUp = false;
                     lastInput = 1;
@@ -180,7 +180,7 @@ namespace Gaming
                         movedThisBeat = true;
                     }
                 }
-                if (currentKeyboardState.IsKeyDown(Keys.A) && priorKeyboardState.IsKeyUp(Keys.A))
+                if (currentKeyboardState.IsKeyDown(Keys.A) && priorKeyboardState.IsKeyUp(Keys.A) && !movedThisBeat)
                 {
                     lastInput = 2;
                     facingLeft = true;
@@ -192,7 +192,7 @@ namespace Gaming
                         movedThisBeat = true;
                     }
                 }
-                if (currentKeyboardState.IsKeyDown(Keys.W) && priorKeyboardState.IsKeyUp(Keys.W))
+                if (currentKeyboardState.IsKeyDown(Keys.W) && priorKeyboardState.IsKeyUp(Keys.W) && !movedThisBeat)
                 {
                     facingUp = true;
                     lastInput = 0;
@@ -204,10 +204,11 @@ namespace Gaming
                         movedThisBeat = true;
                     }
                 }
-                if (currentKeyboardState.IsKeyDown(Keys.Space) && priorKeyboardState.IsKeyUp(Keys.Space))
+                if (currentKeyboardState.IsKeyDown(Keys.Space) && priorKeyboardState.IsKeyUp(Keys.Space) &&!movedThisBeat)
                 {
                     movedThisBeat = true;
                     Attacking = true;
+                    AttackedSquare = Position;
                     if (lastInput == 0) //facing up
                         AttackedSquare.Y = Position.Y - 1;
                     else if (lastInput == 1) //facing down
