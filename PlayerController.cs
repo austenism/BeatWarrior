@@ -153,7 +153,7 @@ namespace Gaming
                 Attacking = false;
                 AttackedSquare = Vector2.Zero;
                 currentKeyboardState = Keyboard.GetState();
-                if (currentKeyboardState.IsKeyDown(Keys.D) && priorKeyboardState.IsKeyUp(Keys.D))
+                if (currentKeyboardState.IsKeyDown(Keys.D) && priorKeyboardState.IsKeyUp(Keys.D) && canMove)
                 {
                     lastInput = 3;
                     facingLeft = false;
