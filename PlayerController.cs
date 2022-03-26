@@ -151,9 +151,9 @@ namespace Gaming
             if (!movedThisBeat)
             {
                 Attacking = false;
-                AttackedSquare = Vector2.Zero;
+                //AttackedSquare = Vector2.Zero;
                 currentKeyboardState = Keyboard.GetState();
-                if (currentKeyboardState.IsKeyDown(Keys.D) && priorKeyboardState.IsKeyUp(Keys.D) && canMove)
+                if (currentKeyboardState.IsKeyDown(Keys.D) && priorKeyboardState.IsKeyUp(Keys.D) && !movedThisBeat)
                 {
                     lastInput = 3;
                     facingLeft = false;
@@ -165,7 +165,7 @@ namespace Gaming
                         movedThisBeat = true;
                     }
                 }
-                if (currentKeyboardState.IsKeyDown(Keys.S) && priorKeyboardState.IsKeyUp(Keys.S) && canMove)
+                if (currentKeyboardState.IsKeyDown(Keys.S) && priorKeyboardState.IsKeyUp(Keys.S) && !movedThisBeat)
                 {
                     facingUp = false;
                     lastInput = 1;
@@ -177,7 +177,7 @@ namespace Gaming
                         movedThisBeat = true;
                     }
                 }
-                if (currentKeyboardState.IsKeyDown(Keys.A) && priorKeyboardState.IsKeyUp(Keys.A) && canMove)
+                if (currentKeyboardState.IsKeyDown(Keys.A) && priorKeyboardState.IsKeyUp(Keys.A) && !movedThisBeat)
                 {
                     lastInput = 2;
                     facingLeft = true;
@@ -189,7 +189,7 @@ namespace Gaming
                         movedThisBeat = true;
                     }
                 }
-                if (currentKeyboardState.IsKeyDown(Keys.W) && priorKeyboardState.IsKeyUp(Keys.W) && canMove)
+                if (currentKeyboardState.IsKeyDown(Keys.W) && priorKeyboardState.IsKeyUp(Keys.W) && !movedThisBeat)
                 {
                     facingUp = true;
                     lastInput = 0;
@@ -201,10 +201,11 @@ namespace Gaming
                         movedThisBeat = true;
                     }
                 }
-                if (currentKeyboardState.IsKeyDown(Keys.Space) && priorKeyboardState.IsKeyUp(Keys.Space))
+                if (currentKeyboardState.IsKeyDown(Keys.Space) && priorKeyboardState.IsKeyUp(Keys.Space) &&!movedThisBeat)
                 {
                     movedThisBeat = true;
                     Attacking = true;
+                    AttackedSquare = Position;
                     if (lastInput == 0) //facing up
                         AttackedSquare.Y = Position.Y - 1;
                     else if (lastInput == 1) //facing down

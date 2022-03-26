@@ -180,7 +180,7 @@ namespace Gaming.GameLoops
             #region CheckCollisions
             foreach (Soup s in soups)
             {
-                if(player.Attacking) //s.Position == player.AttackedSquare &&
+                if(player.Attacking && s.Position == player.AttackedSquare)
                 {
                     s.Dead = true;
                     soupsToRemove.Add(s);
