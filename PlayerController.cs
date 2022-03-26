@@ -157,7 +157,7 @@ namespace Gaming
                 {
                     lastInput = 3;
                     facingLeft = false;
-                    if (Position.X < 11 && !ObstacleRight)
+                    if (Position.X < 11 && !ObstacleRight && canMove)
                     {
                         Position.X = Position.X + 1;
                         canMove = false;
@@ -165,7 +165,7 @@ namespace Gaming
                         movedThisBeat = true;
                     }
                 }
-                if (currentKeyboardState.IsKeyDown(Keys.S) && priorKeyboardState.IsKeyUp(Keys.S))
+                if (currentKeyboardState.IsKeyDown(Keys.S) && priorKeyboardState.IsKeyUp(Keys.S) && canMove)
                 {
                     facingUp = false;
                     lastInput = 1;
@@ -177,7 +177,7 @@ namespace Gaming
                         movedThisBeat = true;
                     }
                 }
-                if (currentKeyboardState.IsKeyDown(Keys.A) && priorKeyboardState.IsKeyUp(Keys.A))
+                if (currentKeyboardState.IsKeyDown(Keys.A) && priorKeyboardState.IsKeyUp(Keys.A) && canMove)
                 {
                     lastInput = 2;
                     facingLeft = true;
@@ -189,7 +189,7 @@ namespace Gaming
                         movedThisBeat = true;
                     }
                 }
-                if (currentKeyboardState.IsKeyDown(Keys.W) && priorKeyboardState.IsKeyUp(Keys.W))
+                if (currentKeyboardState.IsKeyDown(Keys.W) && priorKeyboardState.IsKeyUp(Keys.W) && canMove)
                 {
                     facingUp = true;
                     lastInput = 0;
