@@ -199,9 +199,9 @@ namespace Gaming.GameLoops
         public override void Draw(GameTime gameTime, SpriteBatch spriteBatch)
         {
             _tiledMapRenderer.Draw(viewMatrix : Matrix.CreateTranslation((float)Constants.BORDERSIZE, (float)Constants.BORDERSIZE, 0));
-            spriteBatch.Begin();
+            spriteBatch.Begin(SpriteSortMode.Deferred, BlendState.AlphaBlend);
             player.Draw(gameTime, spriteBatch);
-
+            
             foreach (Soup s in soups)
             {
                 s.Draw(gameTime, spriteBatch);

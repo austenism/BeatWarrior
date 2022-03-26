@@ -15,6 +15,8 @@ namespace Gaming
         private Texture2D playerTexture;
         private Texture2D UpplayerTexture;
 
+        private Texture2D barTexture;
+
         private KeyboardState currentKeyboardState;
         private KeyboardState priorKeyboardState;
 
@@ -80,6 +82,8 @@ namespace Gaming
 
             heartTexture = Content.Load<Texture2D>("Heart");
             HurtSound = Content.Load<SoundEffect>("HurtSound");
+
+            barTexture = Content.Load<Texture2D>("BarStuff/EmptySlots");
         }
         public void Update(GameTime gameTime)
         {
@@ -151,7 +155,6 @@ namespace Gaming
             if (!movedThisBeat)
             {
                 Attacking = false;
-                AttackedSquare = Vector2.Zero;
                 currentKeyboardState = Keyboard.GetState();
                 if (currentKeyboardState.IsKeyDown(Keys.D) && priorKeyboardState.IsKeyUp(Keys.D))
                 {
@@ -316,6 +319,7 @@ namespace Gaming
                 spriteBatch.Draw(heartTexture, healthBarPosition + new Vector2(64 * 2, 0), emptyHeart, Color.White, 0, Vector2.Zero, 1f, SpriteEffects.None, 0);
             }
             #endregion
+            spriteBatch.Draw(barTexture, new Vector2(64 + 8, 856), Color.White);
         }
         public void TakeDamage()
         {
