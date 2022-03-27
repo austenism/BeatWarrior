@@ -16,6 +16,14 @@ namespace Gaming
         Move,
         Attack
     }
+
+    enum Facing
+    {
+        Down,
+        Left,
+        Up,
+        Right
+    }
     public class PlayerController
     {
         private ContentManager Content;
@@ -36,9 +44,7 @@ namespace Gaming
         bool movingLeft = false;
         static float speed = 500;
 
-        bool facingLeft = false;
-        bool facingUp = false;
-        int lastInput;
+        Facing curFacing = 0;
 
         //these can be updated by the level to say if theres anything preventing the player from moving there
         public bool ObstacleLeft = false;
@@ -84,8 +90,8 @@ namespace Gaming
         {
             Content = content;
 
-            Position.X = 0;
-            Position.Y = 0;
+            Position.X = 6;
+            Position.Y = 6;
         }
 
         public void LoadContent()
@@ -148,12 +154,36 @@ namespace Gaming
                 movedThisBeat = false;
                 attackedThisBeat = false;
             }
-            if (delay <= 0)
+            if (delay <= 0) //THE BEAT
             {
                 delay = 60 / (float)BPM;
                 canMove = true;
+                
+                int facingModified = (((((int)curFacing + 1) / 2) % 2) * 2) - 1;
+
+                int deltaX = facingModified * (int)curFacing % 2;
+                int deltaY = facingModified * ((int)curFacing + 1) % 2;
+                switch (Measure[beat])
+                {
+                    case Actions.None:
+                        //take stamia
+                        break;
+                    case Actions.Move:
+                        Position.X -= deltaX;
+                        Position.Y -= deltaY;
+                        break;
+                    case Actions.Attack:
+                        AttackedSquare = Position;
+                        AttackedSquare.X -= deltaX;
+                        AttackedSquare.Y -= deltaY;
+                        break;
+                    default:
+                        //also take stamina bc "why"
+                        break;
+                }
+
                 beat = beat + 1;
-                if(beat > 3)
+                if(beat > 3) //change to fade out the previous beat by 50%, then clear it?
                 {
                     beat = 0;
                     Measure[0] = Actions.None;
@@ -177,72 +207,52 @@ namespace Gaming
             {
                 Attacking = false;
                 currentKeyboardState = Keyboard.GetState();
-                if (currentKeyboardState.IsKeyDown(Keys.D) && priorKeyboardState.IsKeyUp(Keys.D) && !movedThisBeat)
+                if (currentKeyboardState.IsKeyDown(Keys.D) && priorKeyboardState.IsKeyUp(Keys.D))
                 {
-                    lastInput = 3;
-                    facingLeft = false;
-                    if (Position.X < 11 && !ObstacleRight && canMove)
+                    curFacing = Facing.Right;
+                    if (Position.X < 11 && !ObstacleRight)
                     {
-                        Position.X = Position.X + 1;
-                        canMove = false;
+                        //canMove = false;
                         movingRight = true;
-                        movedThisBeat = true;
-                        Measure[beat] = Actions.Move;
                     }
                 }
-                if (currentKeyboardState.IsKeyDown(Keys.S) && priorKeyboardState.IsKeyUp(Keys.S) && !movedThisBeat)
+                if (currentKeyboardState.IsKeyDown(Keys.S) && priorKeyboardState.IsKeyUp(Keys.S)) 
                 {
-                    facingUp = false;
-                    lastInput = 1;
+                    curFacing = Facing.Down;
                     if (Position.Y < 11 && !ObstacleDown)
                     {
-                        Position.Y = Position.Y + 1;
-                        canMove = false;
+                        //canMove = false;
                         movingDown = true;
-                        movedThisBeat = true;
-                        Measure[beat] = Actions.Move;
                     }
                 }
-                if (currentKeyboardState.IsKeyDown(Keys.A) && priorKeyboardState.IsKeyUp(Keys.A) && !movedThisBeat)
+                if (currentKeyboardState.IsKeyDown(Keys.A) && priorKeyboardState.IsKeyUp(Keys.A)) 
                 {
-                    lastInput = 2;
-                    facingLeft = true;
+                    curFacing = Facing.Left;
                     if (Position.X > 0 && !ObstacleLeft)
                     {
-                        Position.X = Position.X - 1;
-                        canMove = false;
+                        //canMove = false;
                         movingLeft = true;
-                        movedThisBeat = true;
-                        Measure[beat] = Actions.Move;
                     }
                 }
-                if (currentKeyboardState.IsKeyDown(Keys.W) && priorKeyboardState.IsKeyUp(Keys.W) && !movedThisBeat)
+                if (currentKeyboardState.IsKeyDown(Keys.W) && priorKeyboardState.IsKeyUp(Keys.W)) 
                 {
-                    facingUp = true;
-                    lastInput = 0;
+                    curFacing = Facing.Up;
                     if (Position.Y > 0 && !ObstacleUp)
                     {
-                        Position.Y = Position.Y - 1;
-                        canMove = false;
+                        //canMove = false;
                         movingUp = true;
-                        movedThisBeat = true;
-                        Measure[beat] = Actions.Move;
                     }
                 }
-                if (currentKeyboardState.IsKeyDown(Keys.Space) && priorKeyboardState.IsKeyUp(Keys.Space) &&!movedThisBeat)
+                if (currentKeyboardState.IsKeyDown(Keys.Space) && priorKeyboardState.IsKeyUp(Keys.Space))
                 {
                     attackedThisBeat = true;
                     Measure[beat] = Actions.Attack;
                     Attacking = true;
-                    AttackedSquare = Position;
-                    if (lastInput == 0) //facing up
-                        AttackedSquare.Y = Position.Y - 1;
-                    else if (lastInput == 1) //facing down
-                        AttackedSquare.Y = Position.Y + 1;
-                    else if (lastInput == 2) //facing left
-                        AttackedSquare.X = Position.X - 1;
-                    else                    //facing right
-                        AttackedSquare.X = Position.X + 1;
+                }
+                if (currentKeyboardState.IsKeyDown(Keys.I) && priorKeyboardState.IsKeyUp(Keys.I))
+                {
+                    movedThisBeat = true;
+                    Measure[beat] = Actions.Move;
                 }
                 priorKeyboardState = currentKeyboardState;
             }
@@ -263,16 +273,16 @@ namespace Gaming
             Rectangle source = new Rectangle(animationFrame * 64, 0, 64, 64);
             if (!Invincible)
             {
-                if (facingLeft)
+                if (curFacing == Facing.Left)
                 {
-                    if (!facingUp)
+                    if (curFacing != Facing.Up)
                         spriteBatch.Draw(playerTexture, position, source, Color.White, 0, Vector2.Zero, 1f, SpriteEffects.FlipHorizontally, 0);
                     else
                         spriteBatch.Draw(UpplayerTexture, position, source, Color.White, 0, Vector2.Zero, 1f, SpriteEffects.FlipHorizontally, 0);
                 }
                 else
                 {
-                    if (!facingUp)
+                    if (curFacing != Facing.Up)
                         spriteBatch.Draw(playerTexture, position, source, Color.White, 0, Vector2.Zero, 1f, SpriteEffects.None, 0);
                     else
                         spriteBatch.Draw(UpplayerTexture, position, source, Color.White, 0, Vector2.Zero, 1f, SpriteEffects.None, 0);
@@ -282,16 +292,16 @@ namespace Gaming
             {
                 if (!red)
                 {
-                    if (facingLeft)
+                    if (curFacing == Facing.Left)
                     {
-                        if (!facingUp)
+                        if (curFacing != Facing.Up)
                             spriteBatch.Draw(playerTexture, position, source, Color.White, 0, Vector2.Zero, 1f, SpriteEffects.FlipHorizontally, 0);
                         else
                             spriteBatch.Draw(UpplayerTexture, position, source, Color.White, 0, Vector2.Zero, 1f, SpriteEffects.FlipHorizontally, 0);
                     }
                     else
                     {
-                        if (!facingUp)
+                        if (curFacing != Facing.Up)
                             spriteBatch.Draw(playerTexture, position, source, Color.White, 0, Vector2.Zero, 1f, SpriteEffects.None, 0);
                         else
                             spriteBatch.Draw(UpplayerTexture, position, source, Color.White, 0, Vector2.Zero, 1f, SpriteEffects.None, 0);
@@ -300,16 +310,16 @@ namespace Gaming
                 }
                 else
                 {
-                    if (facingLeft)
+                    if (curFacing == Facing.Left)
                     {
-                        if (!facingUp)
+                        if (curFacing != Facing.Up)
                             spriteBatch.Draw(playerTexture, position, source, Color.Red, 0, Vector2.Zero, 1f, SpriteEffects.FlipHorizontally, 0);
                         else
                             spriteBatch.Draw(UpplayerTexture, position, source, Color.Red, 0, Vector2.Zero, 1f, SpriteEffects.FlipHorizontally, 0);
                     }
                     else
                     {
-                        if (!facingUp)
+                        if (curFacing != Facing.Up)
                             spriteBatch.Draw(playerTexture, position, source, Color.Red, 0, Vector2.Zero, 1f, SpriteEffects.None, 0);
                         else
                             spriteBatch.Draw(UpplayerTexture, position, source, Color.Red, 0, Vector2.Zero, 1f, SpriteEffects.None, 0);
@@ -321,54 +331,38 @@ namespace Gaming
             #region DrawHearts
             Rectangle fullHeart = new Rectangle(0, 0, 64, 64);
             Rectangle emptyHeart = new Rectangle(64, 0, 64, 64);
-            if (Health == 3)
+            for (int i = 0; i < 3; i++)
             {
-                spriteBatch.Draw(heartTexture, healthBarPosition, fullHeart, Color.White, 0, Vector2.Zero, 1f, SpriteEffects.None, 0);
-                spriteBatch.Draw(heartTexture, healthBarPosition + new Vector2(64, 0), fullHeart, Color.White, 0, Vector2.Zero, 1f, SpriteEffects.None, 0);
-                spriteBatch.Draw(heartTexture, healthBarPosition + new Vector2(64 * 2, 0), fullHeart, Color.White, 0, Vector2.Zero, 1f, SpriteEffects.None, 0);
+                if(i + 1 <= Health)
+                {
+                    spriteBatch.Draw(heartTexture, healthBarPosition + new Vector2(64 * i, 0), fullHeart, Color.White, 0, Vector2.Zero, 1f, SpriteEffects.None, 0);
+                }
+                else
+                {
+                    spriteBatch.Draw(heartTexture, healthBarPosition + new Vector2(64 * i, 0), emptyHeart, Color.White, 0, Vector2.Zero, 1f, SpriteEffects.None, 0);
+                }
             }
-            if (Health == 2)
-            {
-                spriteBatch.Draw(heartTexture, healthBarPosition, fullHeart, Color.White, 0, Vector2.Zero, 1f, SpriteEffects.None, 0);
-                spriteBatch.Draw(heartTexture, healthBarPosition + new Vector2(64, 0), fullHeart, Color.White, 0, Vector2.Zero, 1f, SpriteEffects.None, 0);
-                spriteBatch.Draw(heartTexture, healthBarPosition + new Vector2(64 * 2, 0), emptyHeart, Color.White, 0, Vector2.Zero, 1f, SpriteEffects.None, 0);
-            }
-            if (Health == 1)
-            {
-                spriteBatch.Draw(heartTexture, healthBarPosition, fullHeart, Color.White, 0, Vector2.Zero, 1f, SpriteEffects.None, 0);
-                spriteBatch.Draw(heartTexture, healthBarPosition + new Vector2(64, 0), emptyHeart, Color.White, 0, Vector2.Zero, 1f, SpriteEffects.None, 0);
-                spriteBatch.Draw(heartTexture, healthBarPosition + new Vector2(64 * 2, 0), emptyHeart, Color.White, 0, Vector2.Zero, 1f, SpriteEffects.None, 0);
-            }
-            if (Health == 0)
-            {
-                spriteBatch.Draw(heartTexture, healthBarPosition, emptyHeart, Color.White, 0, Vector2.Zero, 1f, SpriteEffects.None, 0);
-                spriteBatch.Draw(heartTexture, healthBarPosition + new Vector2(64, 0), emptyHeart, Color.White, 0, Vector2.Zero, 1f, SpriteEffects.None, 0);
-                spriteBatch.Draw(heartTexture, healthBarPosition + new Vector2(64 * 2, 0), emptyHeart, Color.White, 0, Vector2.Zero, 1f, SpriteEffects.None, 0);
-            }
+            
             #endregion
             spriteBatch.Draw(barTexture, new Vector2(64 + 8, 856), Color.White);
 
             //spriteBatch.Draw(playerTexture, position, source, Color.White, 0, Vector2.Zero, 1f, SpriteEffects.FlipHorizontally, 0);
-            if (Measure[0] == Actions.Move)
-                spriteBatch.Draw(movingTexture, new Vector2(64 + 8 + (64 * 0), 856), new Rectangle(64 * 0, 0, 64, 64), Color.White, 0, Vector2.Zero, 1f, SpriteEffects.None, 0);
-            if (Measure[1] == Actions.Move)
-                spriteBatch.Draw(movingTexture, new Vector2(64 + 8 + (64 * 1), 856), new Rectangle(64 * 1, 0, 64, 64), Color.White, 0, Vector2.Zero, 1f, SpriteEffects.None, 0);
-            if (Measure[2] == Actions.Move)
-                spriteBatch.Draw(movingTexture, new Vector2(64 + 8 + (64 * 2), 856), new Rectangle(64 * 2, 0, 64, 64), Color.White, 0, Vector2.Zero, 1f, SpriteEffects.None, 0);
-            if (Measure[3] == Actions.Move)
-                spriteBatch.Draw(movingTexture, new Vector2(64 + 8 + (64 * 3), 856), new Rectangle(64 * 3, 0, 64, 64), Color.White, 0, Vector2.Zero, 1f, SpriteEffects.None, 0);
+            for(int ind = 0; ind < 4; ind++)
+            {
+                Texture2D Placeholder = null;
+                switch (Measure[ind])
+                {
+                    case Actions.Move:
+                        Placeholder = movingTexture;
+                        break;
+                    case Actions.Attack:
+                        Placeholder = attackedTexture;
+                        break;
+                }
+                if (Placeholder != null)
+                spriteBatch.Draw(Placeholder, new Vector2(64 + 8 + (64 * ind), 856), new Rectangle(64 * ind, 0, 64, 64), Color.White, 0, Vector2.Zero, 1f, SpriteEffects.None, 0);
+            }
             
-            if (Measure[0] == Actions.Attack)
-                spriteBatch.Draw(attackedTexture, new Vector2(64 + 8 + (64 * 0), 856), new Rectangle(64 * 0, 0, 64, 64), Color.White, 0, Vector2.Zero, 1f, SpriteEffects.None, 0);
-            if (Measure[1] == Actions.Attack)
-                spriteBatch.Draw(attackedTexture, new Vector2(64 + 8 + (64 * 1), 856), new Rectangle(64 * 1, 0, 64, 64), Color.White, 0, Vector2.Zero, 1f, SpriteEffects.None, 0);
-            if (Measure[2] == Actions.Attack)
-                spriteBatch.Draw(attackedTexture, new Vector2(64 + 8 + (64 * 2), 856), new Rectangle(64 * 2, 0, 64, 64), Color.White, 0, Vector2.Zero, 1f, SpriteEffects.None, 0);
-            if (Measure[3] == Actions.Attack)
-                spriteBatch.Draw(attackedTexture, new Vector2(64 + 8 + (64 * 3), 856), new Rectangle(64 * 3, 0, 64, 64), Color.White, 0, Vector2.Zero, 1f, SpriteEffects.None, 0);
-
-
-
             spriteBatch.Draw(trackerTexture, new Vector2(64 + 8 + (64 * beat), 852), Color.White * 0.2f);
         }
         public void TakeDamage()
