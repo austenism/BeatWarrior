@@ -39,6 +39,6 @@ namespace Gaming.GameLoops
         }
         public abstract void LoadContent();
         public abstract bool Update(GameTime gameTime);
-        public abstract void Draw(GameTime gameTime, SpriteBatch spriteBatch);
+        public abstract bool Draw(GameTime gameTime, SpriteBatch spriteBatch);
     }
 }

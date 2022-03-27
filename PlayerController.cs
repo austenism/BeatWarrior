@@ -85,6 +85,8 @@ namespace Gaming
         public float swingingTimer;
         public int swingingFrame;
 
+        public bool Dead = false;
+
         /// <summary>
         /// vector that says where he is by the pixel
         /// </summary>
@@ -464,6 +466,8 @@ namespace Gaming
             Invincible = true;
             Health -= 1;
             HurtSound.Play();
+            if (Health < 1)
+                Dead = true;
         }
     }
 }
