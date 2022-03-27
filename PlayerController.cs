@@ -94,8 +94,8 @@ namespace Gaming
         {
             Content = content;
 
-            Position.X = 6;
-            Position.Y = 6;
+            Position.X = 0;
+            Position.Y = 0;
         }
 
         public void LoadContent()

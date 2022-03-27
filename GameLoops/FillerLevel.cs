@@ -53,13 +53,9 @@ namespace Gaming.GameLoops
             player = new PlayerController(Content);
             player.LoadContent();
 
-            soups.Add(new Enemies.Soup(Content, 5, 6));
-            soups.Add(new Enemies.Soup(Content, 6, 7));
-            soups.Add(new Enemies.Soup(Content, 7, 8));
-            soups.Add(new Enemies.Soup(Content, 8, 9));
-            soups.Add(new Enemies.Soup(Content, 9, 10));
-            soups.Add(new Enemies.Soup(Content, 10, 11));
-            soups.Add(new Enemies.Soup(Content, 8, 11));
+            soups.Add(new Enemies.Soup(Content, 2, 6));
+            soups.Add(new Enemies.Soup(Content, 8, 10));
+
             foreach (Soup s in soups)
             {
                 s.LoadContent(Content);
@@ -71,7 +67,7 @@ namespace Gaming.GameLoops
             if(SongTimer <= 0)
             {
                 SongTimer = SongLength;
-                backgroundMusic.Play();
+                //backgroundMusic.Play();
             }
 
             _tiledMapRenderer.Update(gameTime);

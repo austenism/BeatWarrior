@@ -126,12 +126,6 @@
 /processorParam:Quality=Best
 /build:FillerLevelContent/moosic.wav
 
-#begin FillerLevelContent/stuff.wav
-/importer:WavImporter
-/processor:SoundEffectProcessor
-/processorParam:Quality=Best
-/build:FillerLevelContent/stuff.wav
-
 #begin Heart.png
 /importer:TextureImporter
 /processor:TextureProcessor
