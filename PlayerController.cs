@@ -1,4 +1,5 @@
-﻿using Microsoft.Xna.Framework;
+﻿using Gaming.GameLoops;
+using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Audio;
 using Microsoft.Xna.Framework.Content;
 using Microsoft.Xna.Framework.Graphics;
@@ -19,7 +20,7 @@ namespace Gaming
         Brick
     }
 
-    enum Facing
+    public enum Facing
     {
         Down,
         Left,
@@ -47,6 +48,8 @@ namespace Gaming
 
         private KeyboardState currentKeyboardState;
         private KeyboardState priorKeyboardState;
+
+        //public delegate void createLaser(int facing, Vector2 pos);
 
         bool movingRight = false;
         bool movingDown = false;

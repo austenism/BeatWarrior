@@ -74,18 +74,6 @@
 /processorParam:TextureFormat=Color
 /build:BarStuff/LazerSlot.png
 
-#begin BarStuff/LazerSlot.png
-/importer:TextureImporter
-/processor:TextureProcessor
-/processorParam:ColorKeyColor=255,0,255,255
-/processorParam:ColorKeyEnabled=True
-/processorParam:GenerateMipmaps=False
-/processorParam:PremultiplyAlpha=True
-/processorParam:ResizeToPowerOfTwo=False
-/processorParam:MakeSquare=False
-/processorParam:TextureFormat=Color
-/build:BarStuff/LazerSlot.png
-
 #begin BarStuff/MoveSlots.png
 /importer:TextureImporter
 /processor:TextureProcessor
@@ -221,6 +209,18 @@
 /processorParam:MakeSquare=False
 /processorParam:TextureFormat=Color
 /build:Keys.png
+
+#begin LazerAttackParticle.png
+/importer:TextureImporter
+/processor:TextureProcessor
+/processorParam:ColorKeyColor=255,0,255,255
+/processorParam:ColorKeyEnabled=True
+/processorParam:GenerateMipmaps=False
+/processorParam:PremultiplyAlpha=True
+/processorParam:ResizeToPowerOfTwo=False
+/processorParam:MakeSquare=False
+/processorParam:TextureFormat=Color
+/build:LazerAttackParticle.png
 
 #begin LevelThreeContent/levelThree.tmx
 /importer:TiledMapImporter

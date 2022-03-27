@@ -12,6 +12,7 @@ using System.Text;
 
 namespace Gaming.GameLoops
 {
+    public delegate void createLaser();
     public class FillerLevel : LevelLoop
     {
         public void lasercreator(int direction, Vector2 start)
@@ -55,6 +56,7 @@ namespace Gaming.GameLoops
             #endregion
 
             player = new PlayerController(Content);
+            player.createLaser = 
             player.LoadContent();
             player.createLaser = lasercreator;
 
