@@ -39,6 +39,10 @@ namespace Gaming
         private Texture2D attackedTexture;
         private Texture2D reticleTexture;
         private Texture2D swingingTexture;
+        private Texture2D playerLaser;
+        private Texture2D playerLaserUp;
+        private Texture2D playerLaserDown;
+        private Texture2D playerBrick;
         private Texture2D brickTexture;
         private Texture2D laserTexture;
         private Texture2D timeMarkerTexture;
@@ -74,8 +78,9 @@ namespace Gaming
         static float animationDelayDefault = 0.2f;
         float animationTimer = animationDelayDefault;
 
-        public Action<int, Vector2> createLaser;
-        
+        public Action<int, Vector2, GameTime> createLaser;
+        public Action<int, Vector2, GameTime> createBrick;
+
         public int Health = 3;
         Texture2D heartTexture;
         Vector2 healthBarPosition = new Vector2(0, 0);
@@ -94,6 +99,11 @@ namespace Gaming
         public int brickstartind = -1;
         public float swingingTimer;
         public int swingingFrame;
+        public float castingTimer;
+        public int laserFrame;
+        public Facing LaserFacing;
+        public float throwingtimer;
+        public int throwingframe;
 
         public bool Dead = false;
 
@@ -119,6 +129,10 @@ namespace Gaming
             playerTexture = Content.Load<Texture2D>("PlayerStanding");
             UpplayerTexture = Content.Load<Texture2D>("PlayerStandingBehind");
             swingingTexture = Content.Load<Texture2D>("SwordAttack");
+            playerLaser = Content.Load<Texture2D>("LazerAttack");
+            playerLaserUp = Content.Load<Texture2D>("LazerAttackUp");
+            playerLaserDown = Content.Load<Texture2D>("LazerAttackDown");
+            playerBrick = Content.Load<Texture2D>("BrickAttack");
             Key = Content.Load<Texture2D>("Keys");
 
             heartTexture = Content.Load<Texture2D>("Heart");
@@ -215,14 +229,17 @@ namespace Gaming
                     case Actions.Brick:
                         int brickdir = (int)curFacing;
                         Vector2 brickspawn = new Vector2(Position.X + deltaX, Position.Y + deltaY);
+                        throwingtimer = 0.5f;
                         throwing = true;
+                        createBrick(brickdir, brickspawn, gameTime);
                         break;
                     case Actions.Laser:
                         if (beat == laserstartind)
                         {
                             int laserdir = (int)curFacing;
                             Vector2 laserspawn = new Vector2(Position.X + deltaX, Position.Y + deltaY);
-                            createLaser(laserdir, laserspawn);
+                            createLaser(laserdir, laserspawn, gameTime);
+                            castingTimer = 2f;
                             casting = true;
                         }
                         break;
@@ -314,6 +331,7 @@ namespace Gaming
             if (currentKeyboardState.IsKeyDown(Keys.E) && priorKeyboardState.IsKeyUp(Keys.E))
             {
                 Measure[effectivebeat] = Actions.Laser;
+                LaserFacing = curFacing;
                 if (effectivebeat != laserstartind + 4)
                     laserstartind = effectivebeat;
             }
@@ -326,6 +344,7 @@ namespace Gaming
             if (currentKeyboardState.IsKeyDown(Keys.O) && priorKeyboardState.IsKeyUp(Keys.O))
             {
                 Measure[effectivebeat] = Actions.Laser;
+                LaserFacing = curFacing;
                 if (effectivebeat == laserstartind + 4)
                     laserstartind = effectivebeat;
             }
@@ -372,12 +391,13 @@ namespace Gaming
         public void Draw(GameTime gameTime, SpriteBatch spriteBatch)
         {
             #region swingingmath
-            if (swinging)
+            if (swinging | throwing)
             {
                 swingingTimer -= (float)gameTime.ElapsedGameTime.TotalSeconds;
                 if (swingingTimer < 0)
                 {
                     swinging = false;
+                    throwing = false;
                 }
                 else if (swingingTimer <= 0.125f)
                 {
@@ -397,14 +417,47 @@ namespace Gaming
                 }
             }
             #endregion
+            #region LaserMath
+            if (casting)
+            {
+                castingTimer -= (float)gameTime.ElapsedGameTime.TotalSeconds;
+                if (castingTimer < 0)
+                {
+                    casting = false;
+                }
+                else if (castingTimer <= 0.5f)
+                {
+                    laserFrame = 3;
+                }
+                else if (castingTimer <= 1f)
+                {
+                    laserFrame = 2;
+                }
+                else if (castingTimer <= 1.5f)
+                {
+                    laserFrame = 1;
+                }
+                else
+                {
+                    laserFrame = 0;
+                }
+            }
+            #endregion
+            
             #region DrawPlayer
             Rectangle source = new Rectangle(animationFrame * 64, 0, 64, 64);
             Rectangle swingingSource = new Rectangle(swingingFrame * 64, 0, 64, 64);
+            Rectangle LaserSource = new Rectangle(laserFrame * 64, 0, 64, 64);
             
             Color color = Color.White;
             Rectangle animsource = source;
             SpriteEffects effects = SpriteEffects.None;
             Texture2D texture = playerTexture;
+
+            if (casting)
+            {
+                curFacing = LaserFacing;
+            }
 
             if (swinging)
             {
@@ -413,19 +466,26 @@ namespace Gaming
             }
             else if (throwing)
             {
-                //texture = null;//replace when have
+                texture = playerBrick;
+                animsource = swingingSource;
             }
             else if(curFacing == Facing.Up)
             {
                 texture = UpplayerTexture;
                 if (casting)
                 {
-                    //texture = null;//insert upwards laser
+                    texture = playerLaserUp;
+                    animsource = LaserSource;
                 }
             }
             else if (casting)
             {
-                //texture = null;//insert proper texture later
+                animsource = LaserSource;
+                texture = playerLaser;
+                if(curFacing == Facing.Down)
+                {
+                    texture = playerLaserDown;
+                }
             }
 
             if(curFacing == Facing.Left)
