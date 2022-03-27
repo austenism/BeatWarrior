@@ -180,11 +180,11 @@ namespace Gaming
             #endregion
             #region KeyboardInput
             //handle keyboard input
-            if (!movedThisBeat && !attackedThisBeat)
+            //if (!movedThisBeat && !attackedThisBeat)
             {
                 Attacking = false;
                 currentKeyboardState = Keyboard.GetState();
-                if (currentKeyboardState.IsKeyDown(Keys.D) && priorKeyboardState.IsKeyUp(Keys.D) && !movedThisBeat)
+                if (currentKeyboardState.IsKeyDown(Keys.D) && priorKeyboardState.IsKeyUp(Keys.D))
                 {
                     Measure[beat] = Actions.Move;
                     curFacing = Facing.Right;
@@ -195,7 +195,7 @@ namespace Gaming
                         movingRight = true;
                     }
                 }
-                if (currentKeyboardState.IsKeyDown(Keys.S) && priorKeyboardState.IsKeyUp(Keys.S) && !movedThisBeat)
+                if (currentKeyboardState.IsKeyDown(Keys.S) && priorKeyboardState.IsKeyUp(Keys.S))
                 {
                     Measure[beat] = Actions.Move;
                     curFacing = Facing.Down;
@@ -206,7 +206,7 @@ namespace Gaming
                         movingDown = true;
                     }
                 }
-                if (currentKeyboardState.IsKeyDown(Keys.A) && priorKeyboardState.IsKeyUp(Keys.A) && !movedThisBeat)
+                if (currentKeyboardState.IsKeyDown(Keys.A) && priorKeyboardState.IsKeyUp(Keys.A))
                 {
                     Measure[beat] = Actions.Move;
                     curFacing = Facing.Left;
@@ -217,7 +217,7 @@ namespace Gaming
                         movingLeft = true;
                     }
                 }
-                if (currentKeyboardState.IsKeyDown(Keys.W) && priorKeyboardState.IsKeyUp(Keys.W) && !movedThisBeat)
+                if (currentKeyboardState.IsKeyDown(Keys.W) && priorKeyboardState.IsKeyUp(Keys.W))
                 {
                     Measure[beat] = Actions.Move;
                     curFacing = Facing.Up;
@@ -228,14 +228,14 @@ namespace Gaming
                         movingUp = true;
                     }
                 }
-                if (currentKeyboardState.IsKeyDown(Keys.Space) && priorKeyboardState.IsKeyUp(Keys.Space) && !attackedThisBeat)
+                if (currentKeyboardState.IsKeyDown(Keys.Space) && priorKeyboardState.IsKeyUp(Keys.Space))
                 {
                     attackedThisBeat = true;
                     movedThisBeat = false;
                     Measure[beat] = Actions.Attack;
                     Attacking = true;
                 }
-                if (currentKeyboardState.IsKeyDown(Keys.I) && priorKeyboardState.IsKeyUp(Keys.I) && !attackedThisBeat)
+                if (currentKeyboardState.IsKeyDown(Keys.I) && priorKeyboardState.IsKeyUp(Keys.I))
                 {
                     curFacing = Facing.Up;
                     attackedThisBeat = true;
@@ -243,7 +243,7 @@ namespace Gaming
                     Measure[beat] = Actions.Attack;
                     Attacking = true;
                 }
-                if (currentKeyboardState.IsKeyDown(Keys.J) && priorKeyboardState.IsKeyUp(Keys.J) && !attackedThisBeat)
+                if (currentKeyboardState.IsKeyDown(Keys.J) && priorKeyboardState.IsKeyUp(Keys.J))
                 {
                     curFacing = Facing.Left;
                     attackedThisBeat = true;
@@ -251,7 +251,7 @@ namespace Gaming
                     Measure[beat] = Actions.Attack;
                     Attacking = true;
                 }
-                if (currentKeyboardState.IsKeyDown(Keys.K) && priorKeyboardState.IsKeyUp(Keys.K) && !attackedThisBeat)
+                if (currentKeyboardState.IsKeyDown(Keys.K) && priorKeyboardState.IsKeyUp(Keys.K))
                 {
                     curFacing = Facing.Down;
                     attackedThisBeat = true;
@@ -259,7 +259,7 @@ namespace Gaming
                     Measure[beat] = Actions.Attack;
                     Attacking = true;
                 }
-                if (currentKeyboardState.IsKeyDown(Keys.L) && priorKeyboardState.IsKeyUp(Keys.L) && !attackedThisBeat)
+                if (currentKeyboardState.IsKeyDown(Keys.L) && priorKeyboardState.IsKeyUp(Keys.L))
                 {
                     curFacing = Facing.Right;
                     attackedThisBeat = true;
@@ -272,12 +272,14 @@ namespace Gaming
 
                 int deltaX = (facingModified * (int)curFacing % 2) * -1;
                 int deltaY = (facingModified * ((int)curFacing + 1) % 2) * -1;
+            }
+            if(!actionTaken)
                 if (movedThisBeat || attackedThisBeat)
                 {
                     switch (Measure[beat])
                     {
                         case Actions.None:
-                            //take stamia
+                            //take stamina
                             break;
                         case Actions.Move:
                             Position.X += deltaX;
