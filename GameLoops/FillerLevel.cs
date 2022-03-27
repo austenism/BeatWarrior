@@ -12,6 +12,7 @@ using System.Text;
 
 namespace Gaming.GameLoops
 {
+    public delegate void createLaser();
     public class FillerLevel : LevelLoop
     {
 
@@ -51,6 +52,7 @@ namespace Gaming.GameLoops
             #endregion
 
             player = new PlayerController(Content);
+            player.createLaser = 
             player.LoadContent();
 
             soups.Add(new Enemies.Soup(Content, 2, 6));

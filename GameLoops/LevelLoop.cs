@@ -7,6 +7,7 @@ using Microsoft.Xna.Framework.Input;
 using Microsoft.Xna.Framework.Media;
 using MonoGame.Extended.Tiled;
 using MonoGame.Extended.Tiled.Renderers;
+using System;
 using System.Collections.Generic;
 using System.Security.Policy;
 
@@ -16,6 +17,8 @@ namespace Gaming.GameLoops
     {
         public TiledMap _tiledMap;
         public TiledMapRenderer _tiledMapRenderer;
+
+        
 
         public int[,] Obstacles;
 
