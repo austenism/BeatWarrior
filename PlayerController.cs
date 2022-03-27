@@ -14,7 +14,9 @@ namespace Gaming
     {
         None,
         Move,
-        Attack
+        Attack,
+        Laser,
+        Brick
     }
 
     enum Facing
