@@ -35,6 +35,7 @@ namespace Gaming
         private Texture2D movingTexture;
         private Texture2D attackedTexture;
         private Texture2D reticleTexture;
+        private Texture2D swingingTexture;
 
         int deltaX = 0;
         int deltaY = 0;
@@ -80,6 +81,9 @@ namespace Gaming
 
         public bool Attacking = false;
         public Vector2 AttackedSquare = Vector2.Zero;
+        public bool swinging = false;
+        public float swingingTimer;
+        public int swingingFrame;
 
         /// <summary>
         /// vector that says where he is by the pixel
@@ -102,6 +106,7 @@ namespace Gaming
         {
             playerTexture = Content.Load<Texture2D>("PlayerStanding");
             UpplayerTexture = Content.Load<Texture2D>("PlayerStandingBehind");
+            swingingTexture = Content.Load<Texture2D>("SwordAttack");
 
             heartTexture = Content.Load<Texture2D>("Heart");
             HurtSound = Content.Load<SoundEffect>("HurtSound");
@@ -196,6 +201,8 @@ namespace Gaming
                         AttackedSquare = Position;
                         AttackedSquare.X += deltaX;
                         AttackedSquare.Y += deltaY;
+                        swinging = true;
+                        swingingTimer = 0.5f;
                         Attacking = true;
                         break;
                     default:
@@ -281,7 +288,6 @@ namespace Gaming
                 curFacing = Facing.Right;
                 Measure[beat] = Actions.Attack;
             }
-
             int facingModified = (((((int)curFacing + 1) / 2) % 2) * 2) - 1;
 
             deltaX = (facingModified * (int)curFacing % 2) * -1;
@@ -303,23 +309,70 @@ namespace Gaming
         }
         public void Draw(GameTime gameTime, SpriteBatch spriteBatch)
         {
-            #region DrawPlayer
-            Rectangle source = new Rectangle(animationFrame * 64, 0, 64, 64);
-            if (!Invincible)
+            #region swingingmath
+            if (swinging)
             {
-                if (curFacing == Facing.Left)
+                swingingTimer -= (float)gameTime.ElapsedGameTime.TotalSeconds;
+                if (swingingTimer < 0)
                 {
-                    if (curFacing != Facing.Up)
-                        spriteBatch.Draw(playerTexture, position, source, Color.White, 0, Vector2.Zero, 1f, SpriteEffects.FlipHorizontally, 0);
-                    else
-                        spriteBatch.Draw(UpplayerTexture, position, source, Color.White, 0, Vector2.Zero, 1f, SpriteEffects.FlipHorizontally, 0);
+                    swinging = false;
+                }
+                else if (swingingTimer <= 0.125f)
+                {
+                    swingingFrame = 3;
+                }
+                else if (swingingTimer <= 0.25f)
+                {
+                    swingingFrame = 2;
+                }
+                else if (swingingTimer <= 0.375)
+                {
+                    swingingFrame = 1;
                 }
                 else
                 {
-                    if (curFacing != Facing.Up)
-                        spriteBatch.Draw(playerTexture, position, source, Color.White, 0, Vector2.Zero, 1f, SpriteEffects.None, 0);
+                    swingingFrame = 0;
+                }
+            }
+            #endregion
+            #region DrawPlayer
+            Rectangle source = new Rectangle(animationFrame * 64, 0, 64, 64);
+            Rectangle swingingSource = new Rectangle(swingingFrame * 64, 0, 64, 64);
+            if (!Invincible)
+            {
+                if (!swinging)
+                {
+                    if (curFacing == Facing.Left)
+                    {
+                        if (curFacing != Facing.Up)
+                            spriteBatch.Draw(playerTexture, position, source, Color.White, 0, Vector2.Zero, 1f, SpriteEffects.FlipHorizontally, 0);
+                        else
+                            spriteBatch.Draw(UpplayerTexture, position, source, Color.White, 0, Vector2.Zero, 1f, SpriteEffects.FlipHorizontally, 0);
+                    }
                     else
-                        spriteBatch.Draw(UpplayerTexture, position, source, Color.White, 0, Vector2.Zero, 1f, SpriteEffects.None, 0);
+                    {
+                        if (curFacing != Facing.Up)
+                            spriteBatch.Draw(playerTexture, position, source, Color.White, 0, Vector2.Zero, 1f, SpriteEffects.None, 0);
+                        else
+                            spriteBatch.Draw(UpplayerTexture, position, source, Color.White, 0, Vector2.Zero, 1f, SpriteEffects.None, 0);
+                    }
+                }
+                else if(swinging)
+                {
+                    if (curFacing == Facing.Left)
+                    {
+                        if (curFacing != Facing.Up)
+                            spriteBatch.Draw(swingingTexture, position, swingingSource, Color.White, 0, Vector2.Zero, 1f, SpriteEffects.FlipHorizontally, 0);
+                        else
+                            spriteBatch.Draw(swingingTexture, position, swingingSource, Color.White, 0, Vector2.Zero, 1f, SpriteEffects.FlipHorizontally, 0);
+                    }
+                    else
+                    {
+                        if (curFacing != Facing.Up)
+                            spriteBatch.Draw(swingingTexture, position, swingingSource, Color.White, 0, Vector2.Zero, 1f, SpriteEffects.None, 0);
+                        else
+                            spriteBatch.Draw(swingingTexture, position, swingingSource, Color.White, 0, Vector2.Zero, 1f, SpriteEffects.None, 0);
+                    }
                 }
             }
             else
@@ -363,6 +416,8 @@ namespace Gaming
             }
             spriteBatch.Draw(reticleTexture, new Vector2((((deltaX + Position.X) * 64) + Constants.BORDERSIZE), (((deltaY + Position.Y) * 64) + Constants.BORDERSIZE)),
                 null, Color.White, 0, Vector2.Zero, 1f, SpriteEffects.None, 0);
+
+            
             #endregion
             #region DrawHearts
             Rectangle fullHeart = new Rectangle(0, 0, 64, 64);

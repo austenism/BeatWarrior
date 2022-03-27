@@ -37,7 +37,7 @@ namespace Gaming.Menu
         }
         public void LoadContent()
         {
-            BigMan = Content.Load<Texture2D>("SwordAttack");
+            BigMan = Content.Load<Texture2D>("MenuContent/SwordAttackBEEG");
             startButton = Content.Load<Texture2D>("MenuContent/Start");
             title = Content.Load<Texture2D>("MenuContent/Title");
             
