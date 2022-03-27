@@ -228,9 +228,42 @@ namespace Gaming
                         movingUp = true;
                     }
                 }
-                if (currentKeyboardState.IsKeyDown(Keys.Space) && priorKeyboardState.IsKeyUp(Keys.Space) && !movedThisBeat)
+                if (currentKeyboardState.IsKeyDown(Keys.Space) && priorKeyboardState.IsKeyUp(Keys.Space) && !attackedThisBeat)
                 {
                     attackedThisBeat = true;
+                    movedThisBeat = false;
+                    Measure[beat] = Actions.Attack;
+                    Attacking = true;
+                }
+                if (currentKeyboardState.IsKeyDown(Keys.I) && priorKeyboardState.IsKeyUp(Keys.I) && !attackedThisBeat)
+                {
+                    curFacing = Facing.Up;
+                    attackedThisBeat = true;
+                    movedThisBeat = false;
+                    Measure[beat] = Actions.Attack;
+                    Attacking = true;
+                }
+                if (currentKeyboardState.IsKeyDown(Keys.J) && priorKeyboardState.IsKeyUp(Keys.J) && !attackedThisBeat)
+                {
+                    curFacing = Facing.Left;
+                    attackedThisBeat = true;
+                    movedThisBeat = false;
+                    Measure[beat] = Actions.Attack;
+                    Attacking = true;
+                }
+                if (currentKeyboardState.IsKeyDown(Keys.K) && priorKeyboardState.IsKeyUp(Keys.K) && !attackedThisBeat)
+                {
+                    curFacing = Facing.Down;
+                    attackedThisBeat = true;
+                    movedThisBeat = false;
+                    Measure[beat] = Actions.Attack;
+                    Attacking = true;
+                }
+                if (currentKeyboardState.IsKeyDown(Keys.L) && priorKeyboardState.IsKeyUp(Keys.L) && !attackedThisBeat)
+                {
+                    curFacing = Facing.Right;
+                    attackedThisBeat = true;
+                    movedThisBeat = false;
                     Measure[beat] = Actions.Attack;
                     Attacking = true;
                 }
