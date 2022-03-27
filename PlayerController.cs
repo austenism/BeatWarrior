@@ -224,8 +224,8 @@ namespace Gaming
                 delay = 60 / (float)BPM;
 
                 beat = (beat + 1) % 8;
-                Measure[(beat + 1) % 8] = Actions.None;
-                
+                Measure[(beat + 5) % 8] = Actions.None;
+
             }
 
             animationTimer += (float)gameTime.ElapsedGameTime.TotalSeconds;
@@ -240,14 +240,18 @@ namespace Gaming
             //handle keyboard input
             currentKeyboardState = Keyboard.GetState();
             int effectivebeat = beat;
-            if(laserstartind != -1 && laserstartind != beat || brickstartind != -1 && brickstartind != beat)
+            if (laserstartind != -1 && laserstartind != beat || brickstartind != -1 && brickstartind != beat)
             {
-                if(Measure[beat] == Actions.Laser)
+                if (Measure[beat] == Actions.Laser)
                 {
                     effectivebeat = (laserstartind + 4) % 8;
                 }
+                if (Measure[beat] == Actions.Brick)
+                {
+                    effectivebeat = (brickstartind + 2) % 8;
+                }
             }
-            
+
             if (currentKeyboardState.IsKeyDown(Keys.D) && priorKeyboardState.IsKeyUp(Keys.D))
             {
                 Measure[effectivebeat] = Actions.Move;
@@ -295,18 +299,47 @@ namespace Gaming
             if (currentKeyboardState.IsKeyDown(Keys.Q) && priorKeyboardState.IsKeyUp(Keys.Q))
             {
                 Measure[effectivebeat] = Actions.Brick;
+                if (effectivebeat != brickstartind + 2)
+                    brickstartind = effectivebeat;
             }
             if (currentKeyboardState.IsKeyDown(Keys.E) && priorKeyboardState.IsKeyUp(Keys.E))
             {
                 Measure[effectivebeat] = Actions.Laser;
+                if (effectivebeat != laserstartind + 4)
+                    laserstartind = effectivebeat;
             }
             if (currentKeyboardState.IsKeyDown(Keys.U) && priorKeyboardState.IsKeyUp(Keys.U))
             {
                 Measure[effectivebeat] = Actions.Brick;
+                if (effectivebeat == brickstartind + 2)
+                    brickstartind = effectivebeat;
             }
             if (currentKeyboardState.IsKeyDown(Keys.O) && priorKeyboardState.IsKeyUp(Keys.O))
             {
                 Measure[effectivebeat] = Actions.Laser;
+                if (effectivebeat == laserstartind + 4)
+                    laserstartind = effectivebeat;
+            }
+
+            if (Measure[effectivebeat] == Actions.Laser)
+            {
+                for (int i = 1; i < 4; i++)
+                {
+                    Measure[(effectivebeat + i) % 8] = Actions.Laser;
+                }
+            }
+            else if (Measure[effectivebeat] == Actions.Brick)
+            {
+                Measure[(effectivebeat + 1) % 8] = Actions.Brick;
+                Measure[(effectivebeat + 2) % 8] = Actions.None;
+                Measure[(effectivebeat + 3) % 8] = Actions.None;
+            }
+            else
+            {
+                for (int i = 1; i < 4; i++)
+                {
+                    Measure[(effectivebeat + i) % 8] = Actions.None;
+                }
             }
             int facingModified = (((((int)curFacing + 1) / 2) % 2) * 2) - 1;
 
@@ -427,14 +460,16 @@ namespace Gaming
             
             #endregion
             spriteBatch.Draw(barTexture, new Vector2(64 + 8, 856), Color.White);
-            spriteBatch.Draw(barTexture, new Vector2(64 + 8 + 4 + 256, 856), Color.White);
+            spriteBatch.Draw(barTexture, new Vector2(64 + 8 + 256, 856), Color.White);
 
 
 
             //spriteBatch.Draw(playerTexture, position, source, Color.White, 0, Vector2.Zero, 1f, SpriteEffects.FlipHorizontally, 0);
-            for(int ind = 0; ind < 8; ind++)
+            for (int ind = 0; ind < 8; ind++)
             {
+                int offset = 0;
                 Texture2D Placeholder = null;
+                Color transparencyFilter = Color.White;
                 switch (Measure[ind])
                 {
                     case Actions.Move:
@@ -445,16 +480,24 @@ namespace Gaming
                         break;
                     case Actions.Brick:
                         Placeholder = brickTexture;
+                        if ((brickstartind % 4) % 2 != 0)
+                        {
+                            offset = 1;
+                        }
                         break;
                     case Actions.Laser:
                         Placeholder = laserTexture;
+                        offset = laserstartind % 4;
                         break;
                 }
+                if (ind == (beat + 6) % 8)
+                    transparencyFilter = Color.White * 0.5f;
+
                 if (Placeholder != null)
-                spriteBatch.Draw(Placeholder, new Vector2(64 + 8 + (4 * ind/4) + (64 * ind), 856), new Rectangle((8 * ind / 4) + 64 * ind, 0, 64, 64), Color.White, 0, Vector2.Zero, 1f, SpriteEffects.None, 0);
+                    spriteBatch.Draw(Placeholder, new Vector2(64 + 8 + (64 * ind), 856), new Rectangle(offset * 256 + 64 * (ind % 4), 0, 64, 64), transparencyFilter, 0, Vector2.Zero, 1f, SpriteEffects.None, 0);
             }
             
-            spriteBatch.Draw(timeMarkerTexture, new Vector2(32 + 6 + (4 * beat / 4) + (64 * beat), 856), Color.White);
+            spriteBatch.Draw(timeMarkerTexture, new Vector2(32 + 8 + (64 * beat), 856), Color.White);
             if(beat == 0)
             {
                 spriteBatch.Draw(timeMarkerTexture, new Vector2(32 + 6 + (8) + (64 * 8), 856), Color.White);
