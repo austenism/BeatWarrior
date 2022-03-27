@@ -215,9 +215,13 @@ namespace Gaming
                         throwing = true;
                         break;
                     case Actions.Laser:
-                        int laserdir = (int)curFacing;
-                        Vector2 laserspawn = new Vector2(Position.X + deltaX, Position.Y + deltaY);
-                        casting = true;
+                        if (beat == laserstartind)
+                        {
+                            int laserdir = (int)curFacing;
+                            Vector2 laserspawn = new Vector2(Position.X + deltaX, Position.Y + deltaY);
+                            createLaser(laserdir, laserspawn);
+                            casting = true;
+                        }
                         break;
                     default:
                         //also take stamina bc "why" or more accurately, HOW
