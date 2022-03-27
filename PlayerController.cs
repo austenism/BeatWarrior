@@ -3,12 +3,19 @@ using Microsoft.Xna.Framework.Audio;
 using Microsoft.Xna.Framework.Content;
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
+using SharpDX.Win32;
 using System;
 using System.Collections.Generic;
 using System.Text;
 
 namespace Gaming
 {
+    enum Actions
+    {
+        None,
+        Move,
+        Attack
+    }
     public class PlayerController
     {
         private ContentManager Content;
@@ -16,6 +23,9 @@ namespace Gaming
         private Texture2D UpplayerTexture;
 
         private Texture2D barTexture;
+        private Texture2D trackerTexture;
+        private Texture2D movingTexture;
+        private Texture2D attackedTexture;
 
         private KeyboardState currentKeyboardState;
         private KeyboardState priorKeyboardState;
@@ -41,6 +51,9 @@ namespace Gaming
         //private float delay2 = inputWindow;
         bool canMove = false;
         bool movedThisBeat = false;
+        bool attackedThisBeat = false;
+        int beat = 0;
+        Actions[] Measure = new Actions[4];
         
         int animationFrame = 0;
         static float animationDelayDefault = 0.2f;
@@ -84,6 +97,9 @@ namespace Gaming
             HurtSound = Content.Load<SoundEffect>("HurtSound");
 
             barTexture = Content.Load<Texture2D>("BarStuff/EmptySlots");
+            trackerTexture = Content.Load<Texture2D>("BarStuff/BeatTracker");
+            movingTexture = Content.Load<Texture2D>("BarStuff/MoveSlots");
+            attackedTexture = Content.Load<Texture2D>("BarStuff/AttackSlots");
         }
         public void Update(GameTime gameTime)
         {
@@ -127,21 +143,26 @@ namespace Gaming
             //do BPM math
             delay -= (float)gameTime.ElapsedGameTime.TotalSeconds;
             
+            if (delay <= 0.01f)
+            {
+                movedThisBeat = false;
+                attackedThisBeat = false;
+            }
             if (delay <= 0)
             {
                 delay = 60 / (float)BPM;
-                //delay2 = inputWindow;
                 canMove = true;
-                movedThisBeat = false;
+                beat = beat + 1;
+                if(beat > 3)
+                {
+                    beat = 0;
+                    Measure[0] = Actions.None;
+                    Measure[1] = Actions.None;
+                    Measure[2] = Actions.None;
+                    Measure[3] = Actions.None;
+                }
             }
-            //if (canMove)
-            //{
-            //    delay2 -= (float)gameTime.ElapsedGameTime.TotalSeconds;
-            //    if (delay2 <= 0)
-            //    {
-            //        canMove = false;
-            //    }
-            //}
+            
             animationTimer += (float)gameTime.ElapsedGameTime.TotalSeconds;
             if (animationTimer > 60 / (float)BPM)
             {
@@ -152,7 +173,7 @@ namespace Gaming
             #endregion
             #region KeyboardInput
             //handle keyboard input
-            if (!movedThisBeat)
+            if (!movedThisBeat && !attackedThisBeat)
             {
                 Attacking = false;
                 currentKeyboardState = Keyboard.GetState();
@@ -166,6 +187,7 @@ namespace Gaming
                         canMove = false;
                         movingRight = true;
                         movedThisBeat = true;
+                        Measure[beat] = Actions.Move;
                     }
                 }
                 if (currentKeyboardState.IsKeyDown(Keys.S) && priorKeyboardState.IsKeyUp(Keys.S) && !movedThisBeat)
@@ -178,6 +200,7 @@ namespace Gaming
                         canMove = false;
                         movingDown = true;
                         movedThisBeat = true;
+                        Measure[beat] = Actions.Move;
                     }
                 }
                 if (currentKeyboardState.IsKeyDown(Keys.A) && priorKeyboardState.IsKeyUp(Keys.A) && !movedThisBeat)
@@ -190,6 +213,7 @@ namespace Gaming
                         canMove = false;
                         movingLeft = true;
                         movedThisBeat = true;
+                        Measure[beat] = Actions.Move;
                     }
                 }
                 if (currentKeyboardState.IsKeyDown(Keys.W) && priorKeyboardState.IsKeyUp(Keys.W) && !movedThisBeat)
@@ -202,11 +226,13 @@ namespace Gaming
                         canMove = false;
                         movingUp = true;
                         movedThisBeat = true;
+                        Measure[beat] = Actions.Move;
                     }
                 }
                 if (currentKeyboardState.IsKeyDown(Keys.Space) && priorKeyboardState.IsKeyUp(Keys.Space) &&!movedThisBeat)
                 {
-                    movedThisBeat = true;
+                    attackedThisBeat = true;
+                    Measure[beat] = Actions.Attack;
                     Attacking = true;
                     AttackedSquare = Position;
                     if (lastInput == 0) //facing up
@@ -321,6 +347,29 @@ namespace Gaming
             }
             #endregion
             spriteBatch.Draw(barTexture, new Vector2(64 + 8, 856), Color.White);
+
+            //spriteBatch.Draw(playerTexture, position, source, Color.White, 0, Vector2.Zero, 1f, SpriteEffects.FlipHorizontally, 0);
+            if (Measure[0] == Actions.Move)
+                spriteBatch.Draw(movingTexture, new Vector2(64 + 8 + (64 * 0), 856), new Rectangle(64 * 0, 0, 64, 64), Color.White, 0, Vector2.Zero, 1f, SpriteEffects.None, 0);
+            if (Measure[1] == Actions.Move)
+                spriteBatch.Draw(movingTexture, new Vector2(64 + 8 + (64 * 1), 856), new Rectangle(64 * 1, 0, 64, 64), Color.White, 0, Vector2.Zero, 1f, SpriteEffects.None, 0);
+            if (Measure[2] == Actions.Move)
+                spriteBatch.Draw(movingTexture, new Vector2(64 + 8 + (64 * 2), 856), new Rectangle(64 * 2, 0, 64, 64), Color.White, 0, Vector2.Zero, 1f, SpriteEffects.None, 0);
+            if (Measure[3] == Actions.Move)
+                spriteBatch.Draw(movingTexture, new Vector2(64 + 8 + (64 * 3), 856), new Rectangle(64 * 3, 0, 64, 64), Color.White, 0, Vector2.Zero, 1f, SpriteEffects.None, 0);
+            
+            if (Measure[0] == Actions.Attack)
+                spriteBatch.Draw(attackedTexture, new Vector2(64 + 8 + (64 * 0), 856), new Rectangle(64 * 0, 0, 64, 64), Color.White, 0, Vector2.Zero, 1f, SpriteEffects.None, 0);
+            if (Measure[1] == Actions.Attack)
+                spriteBatch.Draw(attackedTexture, new Vector2(64 + 8 + (64 * 1), 856), new Rectangle(64 * 1, 0, 64, 64), Color.White, 0, Vector2.Zero, 1f, SpriteEffects.None, 0);
+            if (Measure[2] == Actions.Attack)
+                spriteBatch.Draw(attackedTexture, new Vector2(64 + 8 + (64 * 2), 856), new Rectangle(64 * 2, 0, 64, 64), Color.White, 0, Vector2.Zero, 1f, SpriteEffects.None, 0);
+            if (Measure[3] == Actions.Attack)
+                spriteBatch.Draw(attackedTexture, new Vector2(64 + 8 + (64 * 3), 856), new Rectangle(64 * 3, 0, 64, 64), Color.White, 0, Vector2.Zero, 1f, SpriteEffects.None, 0);
+
+
+
+            spriteBatch.Draw(trackerTexture, new Vector2(64 + 8 + (64 * beat), 852), Color.White * 0.2f);
         }
         public void TakeDamage()
         {
