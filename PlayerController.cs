@@ -201,8 +201,7 @@ namespace Gaming
                     curFacing = Facing.Down;
                     if (Position.Y < 11 && !ObstacleDown)
                     {
-                        movedThisBeat = true;
-                        canMove = false;
+                        //canMove = false;
                         movingDown = true;
                     }
                 }
@@ -212,8 +211,7 @@ namespace Gaming
                     curFacing = Facing.Left;
                     if (Position.X > 0 && !ObstacleLeft)
                     {
-                        movedThisBeat = true;
-                        canMove = false;
+                        //canMove = false;
                         movingLeft = true;
                     }
                 }
@@ -223,8 +221,7 @@ namespace Gaming
                     curFacing = Facing.Up;
                     if (Position.Y > 0 && !ObstacleUp)
                     {
-                        movedThisBeat = true;
-                        canMove = false;
+                        //canMove = false;
                         movingUp = true;
                     }
                 }
