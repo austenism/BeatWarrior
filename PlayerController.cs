@@ -70,6 +70,8 @@ namespace Gaming
         int animationFrame = 0;
         static float animationDelayDefault = 0.2f;
         float animationTimer = animationDelayDefault;
+
+        public Action<int, Vector2> createLaser;
         
         public int Health = 3;
         Texture2D heartTexture;

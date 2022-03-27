@@ -14,6 +14,10 @@ namespace Gaming.GameLoops
 {
     public class FillerLevel : LevelLoop
     {
+        public void lasercreator(int direction, Vector2 start)
+        {
+            //do stuff
+        }
 
         List<Soup> soupsToRemove = new List<Soup>();
         public override void LoadContent()
@@ -52,6 +56,7 @@ namespace Gaming.GameLoops
 
             player = new PlayerController(Content);
             player.LoadContent();
+            player.createLaser = lasercreator;
 
             soups.Add(new Enemies.Soup(Content, 2, 6));
             soups.Add(new Enemies.Soup(Content, 8, 10));
@@ -201,13 +206,8 @@ namespace Gaming.GameLoops
                 return false;
             }
         }
-        public override bool Draw(GameTime gameTime, SpriteBatch spriteBatch)
+        public override void Draw(GameTime gameTime, SpriteBatch spriteBatch)
         {
-            if (player.Dead)
-            {
-                return true;
-            }
-
             _tiledMapRenderer.Draw(viewMatrix : Matrix.CreateTranslation((float)Constants.BORDERSIZE, (float)Constants.BORDERSIZE, 0));
             spriteBatch.Begin(SpriteSortMode.Deferred, BlendState.AlphaBlend);
             player.Draw(gameTime, spriteBatch);
@@ -217,8 +217,6 @@ namespace Gaming.GameLoops
                 s.Draw(gameTime, spriteBatch);
             }
             spriteBatch.End();
-
-            return false;
         }
     }
 }
