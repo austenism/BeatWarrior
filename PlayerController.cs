@@ -227,11 +227,14 @@ namespace Gaming
                         Attacking = true;
                         break;
                     case Actions.Brick:
-                        int brickdir = (int)curFacing;
-                        Vector2 brickspawn = new Vector2(Position.X + deltaX, Position.Y + deltaY);
-                        throwingtimer = 0.5f;
-                        throwing = true;
-                        createBrick(brickdir, brickspawn, gameTime);
+                        if (beat == brickstartind)
+                        {
+                            int brickdir = (int)curFacing;
+                            Vector2 brickspawn = new Vector2(Position.X + deltaX, Position.Y + deltaY);
+                            throwingtimer = 0.5f;
+                            throwing = true;
+                            createBrick(brickdir, brickspawn, gameTime);
+                        }
                         break;
                     case Actions.Laser:
                         if (beat == laserstartind)
