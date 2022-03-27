@@ -79,14 +79,15 @@ namespace Gaming
 
         protected override void Draw(GameTime gameTime)
         {
-            GraphicsDevice.Clear(Color.Gray);
             if (levelMenu)
             {
+                GraphicsDevice.Clear(Color.ForestGreen);
                 menu.Draw(gameTime, _spriteBatch);
             }
             if (levelOne)
             {
-                if(levelOneLoop.Draw(gameTime, _spriteBatch))
+                GraphicsDevice.Clear(Color.ForestGreen);
+                if (levelOneLoop.Draw(gameTime, _spriteBatch))
                 {
                     levelOne = false;
                     levelMenu = true;
@@ -95,6 +96,7 @@ namespace Gaming
             }
             if (levelTwo)
             {
+                GraphicsDevice.Clear(Color.ForestGreen);
                 if (levelTwoLoop.Draw(gameTime, _spriteBatch))
                 {
                     levelTwo = false;
@@ -104,6 +106,7 @@ namespace Gaming
             }
             if (levelThree)
             {
+                GraphicsDevice.Clear(Color.Gray);
                 if (levelThreeLoop.Draw(gameTime, _spriteBatch))
                 {
                     levelThree = false;
