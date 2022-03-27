@@ -25,5 +25,6 @@
   </ItemGroup>
   <ItemGroup>
     <Folder Include="Content\MenuContent\" />
+    <Folder Include="Content\LevelOneContent\" />
   </ItemGroup>
 </Project>

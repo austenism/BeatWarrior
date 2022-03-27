@@ -10,7 +10,7 @@
 
 #-------------------------------- References --------------------------------#
 
-/reference:C:\Users\chawk\.nuget\packages\monogame.extended.content.pipeline\3.8.0\tools\MonoGame.Extended.Content.Pipeline.dll
+/reference:C:\Users\auste\.nuget\packages\monogame.extended.content.pipeline\3.8.0\tools\MonoGame.Extended.Content.Pipeline.dll
 
 #---------------------------------- Content ---------------------------------#
 
@@ -126,11 +126,11 @@
 /processorParam:Quality=Best
 /build:FillerLevelContent/moosic.wav
 
-#begin FillerLevelContent/stuff.wav
+#begin FillerLevelContent/ootsidemoosic.wav
 /importer:WavImporter
 /processor:SoundEffectProcessor
 /processorParam:Quality=Best
-/build:FillerLevelContent/stuff.wav
+/build:FillerLevelContent/ootsidemoosic.wav
 
 #begin Heart.png
 /importer:TextureImporter
@@ -178,6 +178,18 @@
 /processorParam:MakeSquare=False
 /processorParam:TextureFormat=Color
 /build:MenuContent/Start.png
+
+#begin MenuContent/Title.png
+/importer:TextureImporter
+/processor:TextureProcessor
+/processorParam:ColorKeyColor=255,0,255,255
+/processorParam:ColorKeyEnabled=True
+/processorParam:GenerateMipmaps=False
+/processorParam:PremultiplyAlpha=True
+/processorParam:ResizeToPowerOfTwo=False
+/processorParam:MakeSquare=False
+/processorParam:TextureFormat=Color
+/build:MenuContent/Title.png
 
 #begin MenuContent/titleTileMap.tmx
 /importer:TiledMapImporter

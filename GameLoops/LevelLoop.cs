@@ -38,7 +38,7 @@ namespace Gaming.GameLoops
             soups = new List<Soup>();
         }
         public abstract void LoadContent();
-        public abstract void Update(GameTime gameTime);
+        public abstract bool Update(GameTime gameTime);
         public abstract void Draw(GameTime gameTime, SpriteBatch spriteBatch);
     }
 }

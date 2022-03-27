@@ -11,10 +11,16 @@ namespace Gaming
         private GraphicsDeviceManager _graphics;
         private SpriteBatch _spriteBatch;
 
-        LevelLoop currentLevel;
-        bool playingGame = false;
+        
+        bool levelOne = false;
+        bool levelTwo = false;
+        bool levelThree = false;
+        bool levelMenu = true;
 
         MenuLoop menu;
+        LevelLoop levelOneLoop;
+        LevelLoop levelTwoLoop;
+        LevelLoop levelThreeLoop;
 
         public BeatWarrior()
         {
@@ -29,8 +35,11 @@ namespace Gaming
 
         protected override void Initialize()
         {
-            currentLevel = new FillerLevel();
-            currentLevel.Initialize(Content, GraphicsDevice);
+            levelOneLoop = new FillerLevel();
+
+            levelOneLoop.Initialize(Content, GraphicsDevice);
+            //levelTwoLoop.Initialize(Content, GraphicsDevice);
+            //levelThreeLoop.Initialize(Content, GraphicsDevice);
 
             menu = new MenuLoop(Content, GraphicsDevice);
 
@@ -42,29 +51,44 @@ namespace Gaming
         {
             _spriteBatch = new SpriteBatch(GraphicsDevice);
 
-            currentLevel.LoadContent();
-
             menu.LoadContent();
+            levelOneLoop.LoadContent();
+            //levelTwoLoop.LoadContent();
+            //levelThreeLoop.LoadContent();
         }
 
         protected override void Update(GameTime gameTime)
         {
             if (GamePad.GetState(PlayerIndex.One).Buttons.Back == ButtonState.Pressed || Keyboard.GetState().IsKeyDown(Keys.Escape))
                 Exit();
-            if (playingGame)
-                currentLevel.Update(gameTime);
-            else
-                playingGame = menu.Update(gameTime);
+            if (levelMenu)
+            {
+                levelMenu = !menu.Update(gameTime);
+                levelOne = !levelMenu;
+            }
+            if (levelOne)
+            {
+                levelOne = !levelOneLoop.Update(gameTime);
+                levelTwo = !levelOne;
+            }
+           
+            
+
+            
             base.Update(gameTime);
         }
 
         protected override void Draw(GameTime gameTime)
         {
             GraphicsDevice.Clear(Color.Gray);
-            if (playingGame)
-                currentLevel.Draw(gameTime, _spriteBatch);
-            else
+            if (levelMenu)
+            {
                 menu.Draw(gameTime, _spriteBatch);
+            }
+            if (levelOne)
+            {
+                levelOneLoop.Draw(gameTime, _spriteBatch);
+            }
 
             base.Draw(gameTime);
         }
