@@ -50,6 +50,8 @@ namespace Gaming.Enemies
         /// his position according to the grid
         /// </summary>
         public Vector2 Position;
+
+        public Vector2 PrevPos;
         public Soup(ContentManager content, int x, int y)
         {
             Content = content;
@@ -134,6 +136,7 @@ namespace Gaming.Enemies
             if (canMove && !movedThisBeat)
             {
                 random = new Random((int)DateTime.Now.Ticks);
+                PrevPos = Position;
                 int direction = random.Next(0, 4);
                 if (direction == 0)
                 {
