@@ -138,6 +138,40 @@
 /processorParam:Quality=Best
 /build:HurtSound.wav
 
+#begin MenuContent/MedowTileset.png
+/importer:TextureImporter
+/processor:TextureProcessor
+/processorParam:ColorKeyColor=255,0,255,255
+/processorParam:ColorKeyEnabled=True
+/processorParam:GenerateMipmaps=False
+/processorParam:PremultiplyAlpha=True
+/processorParam:ResizeToPowerOfTwo=False
+/processorParam:MakeSquare=False
+/processorParam:TextureFormat=Color
+/build:MenuContent/MedowTileset.png
+
+#begin MenuContent/MedowTileset.tsx
+/importer:TiledMapTilesetImporter
+/processor:TiledMapTilesetProcessor
+/build:MenuContent/MedowTileset.tsx
+
+#begin MenuContent/Start.png
+/importer:TextureImporter
+/processor:TextureProcessor
+/processorParam:ColorKeyColor=255,0,255,255
+/processorParam:ColorKeyEnabled=True
+/processorParam:GenerateMipmaps=False
+/processorParam:PremultiplyAlpha=True
+/processorParam:ResizeToPowerOfTwo=False
+/processorParam:MakeSquare=False
+/processorParam:TextureFormat=Color
+/build:MenuContent/Start.png
+
+#begin MenuContent/titleTileMap.tmx
+/importer:TiledMapImporter
+/processor:TiledMapProcessor
+/build:MenuContent/titleTileMap.tmx
+
 #begin PlayerStanding.png
 /importer:TextureImporter
 /processor:TextureProcessor
@@ -161,4 +195,16 @@
 /processorParam:MakeSquare=False
 /processorParam:TextureFormat=Color
 /build:PlayerStandingBehind.png
+
+#begin SwordAttack.png
+/importer:TextureImporter
+/processor:TextureProcessor
+/processorParam:ColorKeyColor=255,0,255,255
+/processorParam:ColorKeyEnabled=True
+/processorParam:GenerateMipmaps=False
+/processorParam:PremultiplyAlpha=True
+/processorParam:ResizeToPowerOfTwo=False
+/processorParam:MakeSquare=False
+/processorParam:TextureFormat=Color
+/build:SwordAttack.png
 

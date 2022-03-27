@@ -1,4 +1,5 @@
 ﻿using Gaming.GameLoops;
+using Gaming.Menu;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
@@ -11,6 +12,9 @@ namespace Gaming
         private SpriteBatch _spriteBatch;
 
         LevelLoop currentLevel;
+        bool playingGame = false;
+
+        MenuLoop menu;
 
         public BeatWarrior()
         {
@@ -28,6 +32,9 @@ namespace Gaming
             currentLevel = new FillerLevel();
             currentLevel.Initialize(Content, GraphicsDevice);
 
+            menu = new MenuLoop(Content, GraphicsDevice);
+
+
             base.Initialize();
         }
 
@@ -36,24 +43,28 @@ namespace Gaming
             _spriteBatch = new SpriteBatch(GraphicsDevice);
 
             currentLevel.LoadContent();
+
+            menu.LoadContent();
         }
 
         protected override void Update(GameTime gameTime)
         {
             if (GamePad.GetState(PlayerIndex.One).Buttons.Back == ButtonState.Pressed || Keyboard.GetState().IsKeyDown(Keys.Escape))
                 Exit();
-
-            currentLevel.Update(gameTime);
-
+            if (playingGame)
+                currentLevel.Update(gameTime);
+            else
+                playingGame = menu.Update(gameTime);
             base.Update(gameTime);
         }
 
         protected override void Draw(GameTime gameTime)
         {
             GraphicsDevice.Clear(Color.Gray);
-
-            currentLevel.Draw(gameTime, _spriteBatch);
-
+            if (playingGame)
+                currentLevel.Draw(gameTime, _spriteBatch);
+            else
+                menu.Draw(gameTime, _spriteBatch);
 
             base.Draw(gameTime);
         }
