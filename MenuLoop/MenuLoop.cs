@@ -21,6 +21,7 @@ namespace Gaming.Menu
 
         private Texture2D BigMan;
         private Texture2D startButton;
+        private Texture2D title;
 
         int animationFrame = 0;
         float animationTimer;
@@ -38,6 +39,7 @@ namespace Gaming.Menu
         {
             BigMan = Content.Load<Texture2D>("SwordAttack");
             startButton = Content.Load<Texture2D>("MenuContent/Start");
+            title = Content.Load<Texture2D>("MenuContent/Title");
             
             _tiledMap = Content.Load<TiledMap>("MenuContent/titleTileMap");
             _tiledMapRenderer = new TiledMapRenderer(graphicsDevice, _tiledMap);
@@ -82,7 +84,8 @@ namespace Gaming.Menu
                 spriteBatch.Draw(startButton, new Vector2(306, 750), null, Color.White, 0, Vector2.Zero, 1f, SpriteEffects.None, 0);
             else
                 spriteBatch.Draw(startButton, new Vector2(306, 750), null, Color.Green, 0, Vector2.Zero, 1f, SpriteEffects.None, 0);
-            
+
+            spriteBatch.Draw(title, new Vector2(200, 100), null, Color.White, 0, Vector2.Zero, 0.5f, SpriteEffects.None, 0);
             spriteBatch.Draw(BigMan, new Vector2(336, 448), new Rectangle(animationFrame * 192, 0, 192, 192), Color.White, 0, Vector2.Zero, 1f, SpriteEffects.None, 0);
             spriteBatch.End();
         }
