@@ -14,7 +14,9 @@ namespace Gaming
     {
         None,
         Move,
-        Attack
+        Attack,
+        Laser,
+        Brick
     }
 
     enum Facing
@@ -32,11 +34,13 @@ namespace Gaming
         private Texture2D Key;
 
         private Texture2D barTexture;
-        private Texture2D trackerTexture;
         private Texture2D movingTexture;
         private Texture2D attackedTexture;
         private Texture2D reticleTexture;
         private Texture2D swingingTexture;
+        private Texture2D brickTexture;
+        private Texture2D laserTexture;
+        private Texture2D timeMarkerTexture;
 
         int deltaX = 0;
         int deltaY = 0;
@@ -60,12 +64,8 @@ namespace Gaming
 
         private static int BPM = 120;
         private float delay = 60 / (float)BPM;
-        //private float delay2 = inputWindow;
-        //bool canMove = false;
-        //bool movedThisBeat = false;
-        //bool attackedThisBeat = false;
         int beat = 0;
-        Actions[] Measure = new Actions[4];
+        Actions[] Measure = new Actions[8];
         
         int animationFrame = 0;
         static float animationDelayDefault = 0.2f;
@@ -83,6 +83,10 @@ namespace Gaming
         public bool Attacking = false;
         public Vector2 AttackedSquare = Vector2.Zero;
         public bool swinging = false;
+        public bool throwing = false;
+        public bool casting = false;
+        public int laserstartind = -1;
+        public int brickstartind = -1;
         public float swingingTimer;
         public int swingingFrame;
 
@@ -116,9 +120,11 @@ namespace Gaming
             HurtSound = Content.Load<SoundEffect>("HurtSound");
 
             barTexture = Content.Load<Texture2D>("BarStuff/EmptySlots");
-            trackerTexture = Content.Load<Texture2D>("BarStuff/BeatTracker");
             movingTexture = Content.Load<Texture2D>("BarStuff/MoveSlots");
             attackedTexture = Content.Load<Texture2D>("BarStuff/AttackSlots");
+            brickTexture = Content.Load<Texture2D>("BarStuff/BrickSlots");
+            laserTexture = Content.Load<Texture2D>("BarStuff/LazerSlot");
+            timeMarkerTexture = Content.Load<Texture2D>("BarStuff/TimeMarker");
             reticleTexture = Content.Load<Texture2D>("crosshair");
         }
         public void Update(GameTime gameTime)
@@ -163,11 +169,6 @@ namespace Gaming
             //do BPM math
             delay -= (float)gameTime.ElapsedGameTime.TotalSeconds;
 
-            if (delay <= 0.01f)
-            {
-                //movedThisBeat = false;
-                //attackedThisBeat = false;
-            }
             if (delay <= 0) //THE BEAT
             {
                 Attacking = false;
@@ -192,9 +193,6 @@ namespace Gaming
                         }
                         else
                         {
-                            //movedThisBeat = true;
-                            //canMove = false;
-                            //movingUp = true;
                             movingUp = deltaY == -1;
                             movingDown = deltaY == 1;
                             movingRight = deltaX == 1;
@@ -209,32 +207,25 @@ namespace Gaming
                         swingingTimer = 0.5f;
                         Attacking = true;
                         break;
+                    case Actions.Brick:
+                        int brickdir = (int)curFacing;
+                        Vector2 brickspawn = new Vector2(Position.X + deltaX, Position.Y + deltaY);
+                        throwing = true;
+                        break;
+                    case Actions.Laser:
+                        int laserdir = (int)curFacing;
+                        Vector2 laserspawn = new Vector2(Position.X + deltaX, Position.Y + deltaY);
+                        casting = true;
+                        break;
                     default:
-                        //also take stamina bc "why"
+                        //also take stamina bc "why" or more accurately, HOW
                         break;
                 }
                 delay = 60 / (float)BPM;
-                //canMove = true;
-                //actionTaken = false;
 
-                beat = beat + 1;
-                switch (beat)
-                {
-                    case 1:
-                        Measure[2] = Actions.None;
-                        break;
-                    case 2:
-                        Measure[3] = Actions.None;
-                        break;
-                    case 3:
-                        Measure[0] = Actions.None;
-                        break;
-                    case 4:
-                        Measure[1] = Actions.None;
-                        beat = 0;
-                        break;
-
-                }
+                beat = (beat + 1) % 8;
+                Measure[(beat + 1) % 8] = Actions.None;
+                
             }
 
             animationTimer += (float)gameTime.ElapsedGameTime.TotalSeconds;
@@ -248,49 +239,74 @@ namespace Gaming
             #region KeyboardInput
             //handle keyboard input
             currentKeyboardState = Keyboard.GetState();
+            int effectivebeat = beat;
+            if(laserstartind != -1 && laserstartind != beat || brickstartind != -1 && brickstartind != beat)
+            {
+                if(Measure[beat] == Actions.Laser)
+                {
+                    effectivebeat = (laserstartind + 4) % 8;
+                }
+            }
+            
             if (currentKeyboardState.IsKeyDown(Keys.D) && priorKeyboardState.IsKeyUp(Keys.D))
             {
-                Measure[beat] = Actions.Move;
+                Measure[effectivebeat] = Actions.Move;
                 curFacing = Facing.Right;
             }
             if (currentKeyboardState.IsKeyDown(Keys.S) && priorKeyboardState.IsKeyUp(Keys.S))
             {
-                Measure[beat] = Actions.Move;
+                Measure[effectivebeat] = Actions.Move;
                 curFacing = Facing.Down;
             }
             if (currentKeyboardState.IsKeyDown(Keys.A) && priorKeyboardState.IsKeyUp(Keys.A))
             {
-                Measure[beat] = Actions.Move;
+                Measure[effectivebeat] = Actions.Move;
                 curFacing = Facing.Left;
             }
             if (currentKeyboardState.IsKeyDown(Keys.W) && priorKeyboardState.IsKeyUp(Keys.W))
             {
-                Measure[beat] = Actions.Move;
+                Measure[effectivebeat] = Actions.Move;
                 curFacing = Facing.Up;
             }
             if (currentKeyboardState.IsKeyDown(Keys.Space) && priorKeyboardState.IsKeyUp(Keys.Space))
             {
-                Measure[beat] = Actions.Attack;
+                Measure[effectivebeat] = Actions.Attack;
             }
             if (currentKeyboardState.IsKeyDown(Keys.I) && priorKeyboardState.IsKeyUp(Keys.I))
             {
                 curFacing = Facing.Up;
-                Measure[beat] = Actions.Attack;
+                Measure[effectivebeat] = Actions.Attack;
             }
             if (currentKeyboardState.IsKeyDown(Keys.J) && priorKeyboardState.IsKeyUp(Keys.J))
             {
                 curFacing = Facing.Left;
-                Measure[beat] = Actions.Attack;
+                Measure[effectivebeat] = Actions.Attack;
             }
             if (currentKeyboardState.IsKeyDown(Keys.K) && priorKeyboardState.IsKeyUp(Keys.K))
             {
                 curFacing = Facing.Down;
-                Measure[beat] = Actions.Attack;
+                Measure[effectivebeat] = Actions.Attack;
             }
             if (currentKeyboardState.IsKeyDown(Keys.L) && priorKeyboardState.IsKeyUp(Keys.L))
             {
                 curFacing = Facing.Right;
-                Measure[beat] = Actions.Attack;
+                Measure[effectivebeat] = Actions.Attack;
+            }
+            if (currentKeyboardState.IsKeyDown(Keys.Q) && priorKeyboardState.IsKeyUp(Keys.Q))
+            {
+                Measure[effectivebeat] = Actions.Brick;
+            }
+            if (currentKeyboardState.IsKeyDown(Keys.E) && priorKeyboardState.IsKeyUp(Keys.E))
+            {
+                Measure[effectivebeat] = Actions.Laser;
+            }
+            if (currentKeyboardState.IsKeyDown(Keys.U) && priorKeyboardState.IsKeyUp(Keys.U))
+            {
+                Measure[effectivebeat] = Actions.Brick;
+            }
+            if (currentKeyboardState.IsKeyDown(Keys.O) && priorKeyboardState.IsKeyUp(Keys.O))
+            {
+                Measure[effectivebeat] = Actions.Laser;
             }
             int facingModified = (((((int)curFacing + 1) / 2) % 2) * 2) - 1;
 
@@ -342,82 +358,53 @@ namespace Gaming
             #region DrawPlayer
             Rectangle source = new Rectangle(animationFrame * 64, 0, 64, 64);
             Rectangle swingingSource = new Rectangle(swingingFrame * 64, 0, 64, 64);
-            if (!Invincible)
+            
+            Color color = Color.White;
+            Rectangle animsource = source;
+            SpriteEffects effects = SpriteEffects.None;
+            Texture2D texture = playerTexture;
+
+            if (swinging)
             {
-                if (!swinging)
+                texture = swingingTexture;
+                animsource = swingingSource;
+            }
+            else if (throwing)
+            {
+                //texture = null;//replace when have
+            }
+            else if(curFacing == Facing.Up)
+            {
+                texture = UpplayerTexture;
+                if (casting)
                 {
-                    if (curFacing == Facing.Left)
-                    {
-                        if (curFacing != Facing.Up)
-                            spriteBatch.Draw(playerTexture, position, source, Color.White, 0, Vector2.Zero, 1f, SpriteEffects.FlipHorizontally, 0);
-                        else
-                            spriteBatch.Draw(UpplayerTexture, position, source, Color.White, 0, Vector2.Zero, 1f, SpriteEffects.FlipHorizontally, 0);
-                    }
-                    else
-                    {
-                        if (curFacing != Facing.Up)
-                            spriteBatch.Draw(playerTexture, position, source, Color.White, 0, Vector2.Zero, 1f, SpriteEffects.None, 0);
-                        else
-                            spriteBatch.Draw(UpplayerTexture, position, source, Color.White, 0, Vector2.Zero, 1f, SpriteEffects.None, 0);
-                    }
-                }
-                else if(swinging)
-                {
-                    if (curFacing == Facing.Left)
-                    {
-                        if (curFacing != Facing.Up)
-                            spriteBatch.Draw(swingingTexture, position, swingingSource, Color.White, 0, Vector2.Zero, 1f, SpriteEffects.FlipHorizontally, 0);
-                        else
-                            spriteBatch.Draw(swingingTexture, position, swingingSource, Color.White, 0, Vector2.Zero, 1f, SpriteEffects.FlipHorizontally, 0);
-                    }
-                    else
-                    {
-                        if (curFacing != Facing.Up)
-                            spriteBatch.Draw(swingingTexture, position, swingingSource, Color.White, 0, Vector2.Zero, 1f, SpriteEffects.None, 0);
-                        else
-                            spriteBatch.Draw(swingingTexture, position, swingingSource, Color.White, 0, Vector2.Zero, 1f, SpriteEffects.None, 0);
-                    }
+                    //texture = null;//insert upwards laser
                 }
             }
-            else
+            else if (casting)
             {
-                if (!red)
+                //texture = null;//insert proper texture later
+            }
+
+            if(curFacing == Facing.Left)
+            {
+                effects = SpriteEffects.FlipHorizontally;
+            }
+
+            if (Invincible)
+            {
+                if (red)
                 {
-                    if (curFacing == Facing.Left)
-                    {
-                        if (curFacing != Facing.Up)
-                            spriteBatch.Draw(playerTexture, position, source, Color.White, 0, Vector2.Zero, 1f, SpriteEffects.FlipHorizontally, 0);
-                        else
-                            spriteBatch.Draw(UpplayerTexture, position, source, Color.White, 0, Vector2.Zero, 1f, SpriteEffects.FlipHorizontally, 0);
-                    }
-                    else
-                    {
-                        if (curFacing != Facing.Up)
-                            spriteBatch.Draw(playerTexture, position, source, Color.White, 0, Vector2.Zero, 1f, SpriteEffects.None, 0);
-                        else
-                            spriteBatch.Draw(UpplayerTexture, position, source, Color.White, 0, Vector2.Zero, 1f, SpriteEffects.None, 0);
-                    }
-                    red = true;
+                    color = Color.Red;
+                    red = false;
                 }
                 else
                 {
-                    if (curFacing == Facing.Left)
-                    {
-                        if (curFacing != Facing.Up)
-                            spriteBatch.Draw(playerTexture, position, source, Color.Red, 0, Vector2.Zero, 1f, SpriteEffects.FlipHorizontally, 0);
-                        else
-                            spriteBatch.Draw(UpplayerTexture, position, source, Color.Red, 0, Vector2.Zero, 1f, SpriteEffects.FlipHorizontally, 0);
-                    }
-                    else
-                    {
-                        if (curFacing != Facing.Up)
-                            spriteBatch.Draw(playerTexture, position, source, Color.Red, 0, Vector2.Zero, 1f, SpriteEffects.None, 0);
-                        else
-                            spriteBatch.Draw(UpplayerTexture, position, source, Color.Red, 0, Vector2.Zero, 1f, SpriteEffects.None, 0);
-                    }
-                    red = false;
+                    red = true;
                 }
             }
+
+            spriteBatch.Draw(texture, position, animsource, color, 0, Vector2.Zero, 1f, effects, 0);
             spriteBatch.Draw(reticleTexture, new Vector2((((deltaX + Position.X) * 64) + Constants.BORDERSIZE), (((deltaY + Position.Y) * 64) + Constants.BORDERSIZE)),
                 null, Color.White, 0, Vector2.Zero, 1f, SpriteEffects.None, 0);
 
@@ -440,11 +427,12 @@ namespace Gaming
             
             #endregion
             spriteBatch.Draw(barTexture, new Vector2(64 + 8, 856), Color.White);
+            spriteBatch.Draw(barTexture, new Vector2(64 + 8 + 4 + 256, 856), Color.White);
 
 
 
             //spriteBatch.Draw(playerTexture, position, source, Color.White, 0, Vector2.Zero, 1f, SpriteEffects.FlipHorizontally, 0);
-            for(int ind = 0; ind < 4; ind++)
+            for(int ind = 0; ind < 8; ind++)
             {
                 Texture2D Placeholder = null;
                 switch (Measure[ind])
@@ -455,12 +443,22 @@ namespace Gaming
                     case Actions.Attack:
                         Placeholder = attackedTexture;
                         break;
+                    case Actions.Brick:
+                        Placeholder = brickTexture;
+                        break;
+                    case Actions.Laser:
+                        Placeholder = laserTexture;
+                        break;
                 }
                 if (Placeholder != null)
-                spriteBatch.Draw(Placeholder, new Vector2(64 + 8 + (64 * ind), 856), new Rectangle(64 * ind, 0, 64, 64), Color.White, 0, Vector2.Zero, 1f, SpriteEffects.None, 0);
+                spriteBatch.Draw(Placeholder, new Vector2(64 + 8 + (4 * ind/4) + (64 * ind), 856), new Rectangle((8 * ind / 4) + 64 * ind, 0, 64, 64), Color.White, 0, Vector2.Zero, 1f, SpriteEffects.None, 0);
             }
             
-            spriteBatch.Draw(trackerTexture, new Vector2(64 + 8 + (64 * beat), 852), Color.White * 0.2f);
+            spriteBatch.Draw(timeMarkerTexture, new Vector2(32 + 6 + (4 * beat / 4) + (64 * beat), 856), Color.White);
+            if(beat == 0)
+            {
+                spriteBatch.Draw(timeMarkerTexture, new Vector2(32 + 6 + (8) + (64 * 8), 856), Color.White);
+            }
         }
         public void TakeDamage()
         {
