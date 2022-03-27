@@ -98,6 +98,18 @@
 /processorParam:TextureFormat=Color
 /build:Enemies/SoupBehind.png
 
+#begin Enemies/SpikeBrass.png
+/importer:TextureImporter
+/processor:TextureProcessor
+/processorParam:ColorKeyColor=255,0,255,255
+/processorParam:ColorKeyEnabled=True
+/processorParam:GenerateMipmaps=False
+/processorParam:PremultiplyAlpha=True
+/processorParam:ResizeToPowerOfTwo=False
+/processorParam:MakeSquare=False
+/processorParam:TextureFormat=Color
+/build:Enemies/SpikeBrass.png
+
 #begin FillerLevelContent/fillerTileMap.tmx
 /importer:TiledMapImporter
 /processor:TiledMapProcessor
@@ -149,6 +161,18 @@
 /processor:SoundEffectProcessor
 /processorParam:Quality=Best
 /build:HurtSound.wav
+
+#begin Keys.png
+/importer:TextureImporter
+/processor:TextureProcessor
+/processorParam:ColorKeyColor=255,0,255,255
+/processorParam:ColorKeyEnabled=True
+/processorParam:GenerateMipmaps=False
+/processorParam:PremultiplyAlpha=True
+/processorParam:ResizeToPowerOfTwo=False
+/processorParam:MakeSquare=False
+/processorParam:TextureFormat=Color
+/build:Keys.png
 
 #begin LevelTwoContent/levelTwo.tmx
 /importer:TiledMapImporter

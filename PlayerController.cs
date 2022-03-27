@@ -29,6 +29,7 @@ namespace Gaming
         private ContentManager Content;
         private Texture2D playerTexture;
         private Texture2D UpplayerTexture;
+        private Texture2D Key;
 
         private Texture2D barTexture;
         private Texture2D trackerTexture;
@@ -109,6 +110,7 @@ namespace Gaming
             playerTexture = Content.Load<Texture2D>("PlayerStanding");
             UpplayerTexture = Content.Load<Texture2D>("PlayerStandingBehind");
             swingingTexture = Content.Load<Texture2D>("SwordAttack");
+            Key = Content.Load<Texture2D>("Keys");
 
             heartTexture = Content.Load<Texture2D>("Heart");
             HurtSound = Content.Load<SoundEffect>("HurtSound");
