@@ -12,34 +12,33 @@ using System.Text;
 
 namespace Gaming.GameLoops
 {
-    public class FillerLevel : LevelLoop
+    public class LevelTwoLoop : LevelLoop
     {
-
         List<Soup> soupsToRemove = new List<Soup>();
         public override void LoadContent()
         {
-            backgroundMusic = Content.Load<SoundEffect>("FillerLevelContent/ootsidemoosic");
+            backgroundMusic = Content.Load<SoundEffect>("LevelTwoContent/ootsidemoosic");
             SongLength = 8;
 
-            _tiledMap = Content.Load<TiledMap>("FillerLevelContent/fillerTileMap");
+            _tiledMap = Content.Load<TiledMap>("LevelTwoContent/levelTwo");
             _tiledMapRenderer = new TiledMapRenderer(graphicsDevice, _tiledMap);
 
 
             #region fixArray
             Obstacles = new int[12, 12];
             int[,] temp = new int[12, 12] {
+                {0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 1},
+                {0, 1, 0, 1, 0, 0, 1, 0, 0, 1, 0, 0},
                 {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
-                {0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0},
-                {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
-                {0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0},
-                {0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0},
-                {0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1},
-                {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
-                {0, 0, 0, 1, 0, 0, 0, 0, 0, 1, 0, 0},
-                {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
+                {1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0},
+                {0, 1, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0},
+                {0, 0, 0, 1, 0, 0, 0, 0, 1, 0, 0, 0},
                 {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
                 {0, 1, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0},
-                {0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0}
+                {0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 1, 0},
+                {0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0},
+                {0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0},
+                {0, 1, 0, 0, 0, 1, 0, 0, 0, 0, 0, 1}
             };
             for (int r = 0; r < 12; ++r)
             {
@@ -55,6 +54,13 @@ namespace Gaming.GameLoops
 
             soups.Add(new Enemies.Soup(Content, 2, 6));
             soups.Add(new Enemies.Soup(Content, 8, 10));
+            soups.Add(new Soup(Content, 8, 4));
+            soups.Add(new Soup(Content, 10, 2));
+            soups.Add(new Soup(Content, 8, 0));
+            soups.Add(new Soup(Content, 7, 10));
+            soups.Add(new Soup(Content, 3, 11));
+            soups.Add(new Soup(Content, 1, 10));
+
 
             foreach (Soup s in soups)
             {
@@ -64,14 +70,14 @@ namespace Gaming.GameLoops
         public override bool Update(GameTime gameTime)
         {
             SongTimer -= (float)gameTime.ElapsedGameTime.TotalSeconds;
-            if(SongTimer <= 0)
+            if (SongTimer <= 0)
             {
                 SongTimer = SongLength;
                 backgroundMusic.Play();
             }
 
             _tiledMapRenderer.Update(gameTime);
-            
+
             #region PlayerObstacleMath
             //handles obstacle movement for the player
             if (player.Position.X < 11)
@@ -176,12 +182,12 @@ namespace Gaming.GameLoops
             #region CheckCollisions
             foreach (Soup s in soups)
             {
-                if(player.Attacking && (s.PrevPos == player.AttackedSquare || s.Position == player.AttackedSquare))
+                if (player.Attacking && (s.PrevPos == player.AttackedSquare || s.Position == player.AttackedSquare))
                 {
                     s.Dead = true;
                     soupsToRemove.Add(s);
                 }
-                if(s.Position == player.Position && !player.Invincible && !s.Dead)
+                if (s.Position == player.Position && !player.Invincible && !s.Dead)
                 {
                     player.TakeDamage();
                 }
@@ -192,7 +198,7 @@ namespace Gaming.GameLoops
             }
             #endregion
 
-            if(soups.Count == 0)
+            if (soups.Count == 0)
             {
                 return true;
             }
@@ -208,10 +214,10 @@ namespace Gaming.GameLoops
                 return true;
             }
 
-            _tiledMapRenderer.Draw(viewMatrix : Matrix.CreateTranslation((float)Constants.BORDERSIZE, (float)Constants.BORDERSIZE, 0));
+            _tiledMapRenderer.Draw(viewMatrix: Matrix.CreateTranslation((float)Constants.BORDERSIZE, (float)Constants.BORDERSIZE, 0));
             spriteBatch.Begin(SpriteSortMode.Deferred, BlendState.AlphaBlend);
             player.Draw(gameTime, spriteBatch);
-            
+
             foreach (Soup s in soups)
             {
                 s.Draw(gameTime, spriteBatch);

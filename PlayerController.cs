@@ -31,6 +31,7 @@ namespace Gaming
         private ContentManager Content;
         private Texture2D playerTexture;
         private Texture2D UpplayerTexture;
+        private Texture2D Key;
 
         private Texture2D barTexture;
         private Texture2D movingTexture;
@@ -89,6 +90,8 @@ namespace Gaming
         public float swingingTimer;
         public int swingingFrame;
 
+        public bool Dead = false;
+
         /// <summary>
         /// vector that says where he is by the pixel
         /// </summary>
@@ -111,6 +114,7 @@ namespace Gaming
             playerTexture = Content.Load<Texture2D>("PlayerStanding");
             UpplayerTexture = Content.Load<Texture2D>("PlayerStandingBehind");
             swingingTexture = Content.Load<Texture2D>("SwordAttack");
+            Key = Content.Load<Texture2D>("Keys");
 
             heartTexture = Content.Load<Texture2D>("Heart");
             HurtSound = Content.Load<SoundEffect>("HurtSound");
@@ -462,6 +466,8 @@ namespace Gaming
             Invincible = true;
             Health -= 1;
             HurtSound.Play();
+            if (Health < 1)
+                Dead = true;
         }
     }
 }

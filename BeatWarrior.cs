@@ -35,15 +35,6 @@ namespace Gaming
 
         protected override void Initialize()
         {
-            levelOneLoop = new FillerLevel();
-
-            levelOneLoop.Initialize(Content, GraphicsDevice);
-            //levelTwoLoop.Initialize(Content, GraphicsDevice);
-            //levelThreeLoop.Initialize(Content, GraphicsDevice);
-
-            menu = new MenuLoop(Content, GraphicsDevice);
-
-
             base.Initialize();
         }
 
@@ -51,16 +42,14 @@ namespace Gaming
         {
             _spriteBatch = new SpriteBatch(GraphicsDevice);
 
-            menu.LoadContent();
-            levelOneLoop.LoadContent();
-            //levelTwoLoop.LoadContent();
-            //levelThreeLoop.LoadContent();
+            ReloadLevels();
         }
 
         protected override void Update(GameTime gameTime)
         {
             if (GamePad.GetState(PlayerIndex.One).Buttons.Back == ButtonState.Pressed || Keyboard.GetState().IsKeyDown(Keys.Escape))
                 Exit();
+
             if (levelMenu)
             {
                 levelMenu = !menu.Update(gameTime);
@@ -70,6 +59,11 @@ namespace Gaming
             {
                 levelOne = !levelOneLoop.Update(gameTime);
                 levelTwo = !levelOne;
+            }
+            if (levelTwo)
+            {
+                levelTwo = !levelTwoLoop.Update(gameTime);
+                levelThree = !levelTwo;
             }
            
             
@@ -87,10 +81,41 @@ namespace Gaming
             }
             if (levelOne)
             {
-                levelOneLoop.Draw(gameTime, _spriteBatch);
+                if(levelOneLoop.Draw(gameTime, _spriteBatch))
+                {
+                    levelOne = false;
+                    levelMenu = true;
+                    ReloadLevels();
+                }
+            }
+            if (levelTwo)
+            {
+                if (levelTwoLoop.Draw(gameTime, _spriteBatch))
+                {
+                    levelTwo = false;
+                    levelMenu = true;
+                    ReloadLevels();
+                }
             }
 
             base.Draw(gameTime);
+        }
+
+        private void ReloadLevels()
+        {
+            levelOneLoop = new FillerLevel();
+            levelTwoLoop = new LevelTwoLoop();
+
+            levelOneLoop.Initialize(Content, GraphicsDevice);
+            levelTwoLoop.Initialize(Content, GraphicsDevice);
+            //levelThreeLoop.Initialize(Content, GraphicsDevice);
+
+            menu = new MenuLoop(Content, GraphicsDevice);
+
+            menu.LoadContent();
+            levelOneLoop.LoadContent();
+            levelTwoLoop.LoadContent();
+            //levelThreeLoop.LoadContent();
         }
     }
 }
