@@ -65,6 +65,11 @@ namespace Gaming
                 levelTwo = !levelTwoLoop.Update(gameTime);
                 levelThree = !levelTwo;
             }
+            if (levelThree)
+            {
+                levelThree = !levelThreeLoop.Update(gameTime);
+                levelMenu = !levelThree;
+            }
            
             
 
@@ -97,6 +102,15 @@ namespace Gaming
                     ReloadLevels();
                 }
             }
+            if (levelThree)
+            {
+                if (levelThreeLoop.Draw(gameTime, _spriteBatch))
+                {
+                    levelThree = false;
+                    levelMenu = true;
+                    ReloadLevels();
+                }
+            }
 
             base.Draw(gameTime);
         }
@@ -105,17 +119,18 @@ namespace Gaming
         {
             levelOneLoop = new FillerLevel();
             levelTwoLoop = new LevelTwoLoop();
+            levelThreeLoop = new LevelThree();
 
             levelOneLoop.Initialize(Content, GraphicsDevice);
             levelTwoLoop.Initialize(Content, GraphicsDevice);
-            //levelThreeLoop.Initialize(Content, GraphicsDevice);
+            levelThreeLoop.Initialize(Content, GraphicsDevice);
 
             menu = new MenuLoop(Content, GraphicsDevice);
 
             menu.LoadContent();
             levelOneLoop.LoadContent();
             levelTwoLoop.LoadContent();
-            //levelThreeLoop.LoadContent();
+            levelThreeLoop.LoadContent();
         }
     }
 }

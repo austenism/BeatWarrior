@@ -10,7 +10,7 @@
 
 #-------------------------------- References --------------------------------#
 
-/reference:C:\Users\chawk\.nuget\packages\monogame.extended.content.pipeline\3.8.0\tools\MonoGame.Extended.Content.Pipeline.dll
+/reference:C:\Users\auste\.nuget\packages\monogame.extended.content.pipeline\3.8.0\tools\MonoGame.Extended.Content.Pipeline.dll
 
 #---------------------------------- Content ---------------------------------#
 
@@ -221,6 +221,34 @@
 /processorParam:MakeSquare=False
 /processorParam:TextureFormat=Color
 /build:Keys.png
+
+#begin LevelThreeContent/levelThree.tmx
+/importer:TiledMapImporter
+/processor:TiledMapProcessor
+/build:LevelThreeContent/levelThree.tmx
+
+#begin LevelThreeContent/moosic.wav
+/importer:WavImporter
+/processor:SoundEffectProcessor
+/processorParam:Quality=Best
+/build:LevelThreeContent/moosic.wav
+
+#begin LevelThreeContent/StoneBrick.png
+/importer:TextureImporter
+/processor:TextureProcessor
+/processorParam:ColorKeyColor=255,0,255,255
+/processorParam:ColorKeyEnabled=True
+/processorParam:GenerateMipmaps=False
+/processorParam:PremultiplyAlpha=True
+/processorParam:ResizeToPowerOfTwo=False
+/processorParam:MakeSquare=False
+/processorParam:TextureFormat=Color
+/build:LevelThreeContent/StoneBrick.png
+
+#begin LevelThreeContent/StoneBrick.tsx
+/importer:TiledMapTilesetImporter
+/processor:TiledMapTilesetProcessor
+/build:LevelThreeContent/StoneBrick.tsx
 
 #begin LevelTwoContent/levelTwo.tmx
 /importer:TiledMapImporter

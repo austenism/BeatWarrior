@@ -18,7 +18,7 @@ namespace Gaming.Enemies
         bool movedThisBeat = false;
 
         int animationFrame = 0;
-        bool Hurty = false;
+        public bool Hurty = false;
 
         /// <summary>
         /// vector that says where he is by the pixel
@@ -49,6 +49,7 @@ namespace Gaming.Enemies
             delay -= (float)gameTime.ElapsedGameTime.TotalSeconds;
             if(delay <= 0)
             {
+                delay = 60 / (float)BPM;
                 animationFrame++;
                 if(animationFrame > 2)
                 {
