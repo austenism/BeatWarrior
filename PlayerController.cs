@@ -34,6 +34,10 @@ namespace Gaming
         private Texture2D trackerTexture;
         private Texture2D movingTexture;
         private Texture2D attackedTexture;
+        private Texture2D reticleTexture;
+
+        int deltaX = 0;
+        int deltaY = 0;
 
         private KeyboardState currentKeyboardState;
         private KeyboardState priorKeyboardState;
@@ -55,9 +59,9 @@ namespace Gaming
         private static int BPM = 120;
         private float delay = 60 / (float)BPM;
         //private float delay2 = inputWindow;
-        bool canMove = false;
-        bool movedThisBeat = false;
-        bool attackedThisBeat = false;
+        //bool canMove = false;
+        //bool movedThisBeat = false;
+        //bool attackedThisBeat = false;
         int beat = 0;
         Actions[] Measure = new Actions[4];
         
@@ -106,6 +110,7 @@ namespace Gaming
             trackerTexture = Content.Load<Texture2D>("BarStuff/BeatTracker");
             movingTexture = Content.Load<Texture2D>("BarStuff/MoveSlots");
             attackedTexture = Content.Load<Texture2D>("BarStuff/AttackSlots");
+            reticleTexture = Content.Load<Texture2D>("crosshair");
         }
         public void Update(GameTime gameTime)
         {
@@ -148,28 +153,79 @@ namespace Gaming
             #region BPMMath
             //do BPM math
             delay -= (float)gameTime.ElapsedGameTime.TotalSeconds;
-            
+
             if (delay <= 0.01f)
             {
-                movedThisBeat = false;
-                attackedThisBeat = false;
+                //movedThisBeat = false;
+                //attackedThisBeat = false;
             }
             if (delay <= 0) //THE BEAT
             {
-                delay = 60 / (float)BPM;
-                canMove = true;
-                
-                beat = beat + 1;
-                if(beat > 3) //change to fade out the previous beat by 50%, then clear it?
+                Attacking = false;
+                switch (Measure[beat])
                 {
-                    beat = 0;
-                    Measure[0] = Actions.None;
-                    Measure[1] = Actions.None;
-                    Measure[2] = Actions.None;
-                    Measure[3] = Actions.None;
+                    case Actions.None:
+                        //take stamina
+                        break;
+                    case Actions.Move:
+                        Position.X += deltaX;
+                        Position.Y += deltaY;
+
+                        if (MathHelper.Min(Position.X, Position.Y) < 0 ||
+                            MathHelper.Max(Position.X, Position.Y) > 11 ||
+                            ObstacleLeft && deltaX == -1 ||
+                            ObstacleRight && deltaX == 1 ||
+                            ObstacleUp && deltaY == -1 ||
+                            ObstacleDown && deltaY == 1)
+                        {
+                            Position.X -= deltaX;
+                            Position.Y -= deltaY;
+                        }
+                        else
+                        {
+                            //movedThisBeat = true;
+                            //canMove = false;
+                            //movingUp = true;
+                            movingUp = deltaY == -1;
+                            movingDown = deltaY == 1;
+                            movingRight = deltaX == 1;
+                            movingLeft = deltaX == -1;
+                        }
+                        break;
+                    case Actions.Attack:
+                        AttackedSquare = Position;
+                        AttackedSquare.X += deltaX;
+                        AttackedSquare.Y += deltaY;
+                        Attacking = true;
+                        break;
+                    default:
+                        //also take stamina bc "why"
+                        break;
+                }
+                delay = 60 / (float)BPM;
+                //canMove = true;
+                //actionTaken = false;
+
+                beat = beat + 1;
+                switch (beat)
+                {
+                    case 1:
+                        Measure[2] = Actions.None;
+                        break;
+                    case 2:
+                        Measure[3] = Actions.None;
+                        break;
+                    case 3:
+                        Measure[0] = Actions.None;
+                        break;
+                    case 4:
+                        Measure[1] = Actions.None;
+                        beat = 0;
+                        break;
+
                 }
             }
-            
+
             animationTimer += (float)gameTime.ElapsedGameTime.TotalSeconds;
             if (animationTimer > 60 / (float)BPM)
             {
@@ -180,123 +236,60 @@ namespace Gaming
             #endregion
             #region KeyboardInput
             //handle keyboard input
-            //if (!movedThisBeat && !attackedThisBeat)
+            currentKeyboardState = Keyboard.GetState();
+            if (currentKeyboardState.IsKeyDown(Keys.D) && priorKeyboardState.IsKeyUp(Keys.D))
             {
-                Attacking = false;
-                currentKeyboardState = Keyboard.GetState();
-                if (currentKeyboardState.IsKeyDown(Keys.D) && priorKeyboardState.IsKeyUp(Keys.D))
-                {
-                    Measure[beat] = Actions.Move;
-                    curFacing = Facing.Right;
-                    if (Position.X < 11 && !ObstacleRight)
-                    {
-                        movedThisBeat = true;
-                        canMove = false;
-                        movingRight = true;
-                    }
-                }
-                if (currentKeyboardState.IsKeyDown(Keys.S) && priorKeyboardState.IsKeyUp(Keys.S))
-                {
-                    Measure[beat] = Actions.Move;
-                    curFacing = Facing.Down;
-                    if (Position.Y < 11 && !ObstacleDown)
-                    {
-                        movedThisBeat = true;
-                        canMove = false;
-                        movingDown = true;
-                    }
-                }
-                if (currentKeyboardState.IsKeyDown(Keys.A) && priorKeyboardState.IsKeyUp(Keys.A))
-                {
-                    Measure[beat] = Actions.Move;
-                    curFacing = Facing.Left;
-                    if (Position.X > 0 && !ObstacleLeft)
-                    {
-                        movedThisBeat = true;
-                        canMove = false;
-                        movingLeft = true;
-                    }
-                }
-                if (currentKeyboardState.IsKeyDown(Keys.W) && priorKeyboardState.IsKeyUp(Keys.W))
-                {
-                    Measure[beat] = Actions.Move;
-                    curFacing = Facing.Up;
-                    if (Position.Y > 0 && !ObstacleUp)
-                    {
-                        movedThisBeat = true;
-                        canMove = false;
-                        movingUp = true;
-                    }
-                }
-                if (currentKeyboardState.IsKeyDown(Keys.Space) && priorKeyboardState.IsKeyUp(Keys.Space))
-                {
-                    attackedThisBeat = true;
-                    movedThisBeat = false;
-                    Measure[beat] = Actions.Attack;
-                    Attacking = true;
-                }
-                if (currentKeyboardState.IsKeyDown(Keys.I) && priorKeyboardState.IsKeyUp(Keys.I))
-                {
-                    curFacing = Facing.Up;
-                    attackedThisBeat = true;
-                    movedThisBeat = false;
-                    Measure[beat] = Actions.Attack;
-                    Attacking = true;
-                }
-                if (currentKeyboardState.IsKeyDown(Keys.J) && priorKeyboardState.IsKeyUp(Keys.J))
-                {
-                    curFacing = Facing.Left;
-                    attackedThisBeat = true;
-                    movedThisBeat = false;
-                    Measure[beat] = Actions.Attack;
-                    Attacking = true;
-                }
-                if (currentKeyboardState.IsKeyDown(Keys.K) && priorKeyboardState.IsKeyUp(Keys.K))
-                {
-                    curFacing = Facing.Down;
-                    attackedThisBeat = true;
-                    movedThisBeat = false;
-                    Measure[beat] = Actions.Attack;
-                    Attacking = true;
-                }
-                if (currentKeyboardState.IsKeyDown(Keys.L) && priorKeyboardState.IsKeyUp(Keys.L))
-                {
-                    curFacing = Facing.Right;
-                    attackedThisBeat = true;
-                    movedThisBeat = false;
-                    Measure[beat] = Actions.Attack;
-                    Attacking = true;
-                }
-
-                int facingModified = (((((int)curFacing + 1) / 2) % 2) * 2) - 1;
-
-                int deltaX = (facingModified * (int)curFacing % 2) * -1;
-                int deltaY = (facingModified * ((int)curFacing + 1) % 2) * -1;
+                Measure[beat] = Actions.Move;
+                curFacing = Facing.Right;
             }
-            if(!actionTaken)
-                if (movedThisBeat || attackedThisBeat)
-                {
-                    switch (Measure[beat])
-                    {
-                        case Actions.None:
-                            //take stamina
-                            break;
-                        case Actions.Move:
-                            Position.X += deltaX;
-                            Position.Y += deltaY;
-                            break;
-                        case Actions.Attack:
-                            AttackedSquare = Position;
-                            AttackedSquare.X += deltaX;
-                            AttackedSquare.Y += deltaY;
-                            break;
-                        default:
-                            //also take stamina bc "why"
-                            break;
-                    }
-                }
-                priorKeyboardState = currentKeyboardState;
+            if (currentKeyboardState.IsKeyDown(Keys.S) && priorKeyboardState.IsKeyUp(Keys.S))
+            {
+                Measure[beat] = Actions.Move;
+                curFacing = Facing.Down;
             }
+            if (currentKeyboardState.IsKeyDown(Keys.A) && priorKeyboardState.IsKeyUp(Keys.A))
+            {
+                Measure[beat] = Actions.Move;
+                curFacing = Facing.Left;
+            }
+            if (currentKeyboardState.IsKeyDown(Keys.W) && priorKeyboardState.IsKeyUp(Keys.W))
+            {
+                Measure[beat] = Actions.Move;
+                curFacing = Facing.Up;
+            }
+            if (currentKeyboardState.IsKeyDown(Keys.Space) && priorKeyboardState.IsKeyUp(Keys.Space))
+            {
+                Measure[beat] = Actions.Attack;
+            }
+            if (currentKeyboardState.IsKeyDown(Keys.I) && priorKeyboardState.IsKeyUp(Keys.I))
+            {
+                curFacing = Facing.Up;
+                Measure[beat] = Actions.Attack;
+            }
+            if (currentKeyboardState.IsKeyDown(Keys.J) && priorKeyboardState.IsKeyUp(Keys.J))
+            {
+                curFacing = Facing.Left;
+                Measure[beat] = Actions.Attack;
+            }
+            if (currentKeyboardState.IsKeyDown(Keys.K) && priorKeyboardState.IsKeyUp(Keys.K))
+            {
+                curFacing = Facing.Down;
+                Measure[beat] = Actions.Attack;
+            }
+            if (currentKeyboardState.IsKeyDown(Keys.L) && priorKeyboardState.IsKeyUp(Keys.L))
+            {
+                curFacing = Facing.Right;
+                Measure[beat] = Actions.Attack;
+            }
+
+            int facingModified = (((((int)curFacing + 1) / 2) % 2) * 2) - 1;
+
+            deltaX = (facingModified * (int)curFacing % 2) * -1;
+            deltaY = (facingModified * ((int)curFacing + 1) % 2) * -1;
+
+
+            priorKeyboardState = currentKeyboardState;
+
             #endregion
             if (Invincible)
             {
@@ -368,6 +361,8 @@ namespace Gaming
                     red = false;
                 }
             }
+            spriteBatch.Draw(reticleTexture, new Vector2((((deltaX + Position.X) * 64) + Constants.BORDERSIZE), (((deltaY + Position.Y) * 64) + Constants.BORDERSIZE)),
+                null, Color.White, 0, Vector2.Zero, 1f, SpriteEffects.None, 0);
             #endregion
             #region DrawHearts
             Rectangle fullHeart = new Rectangle(0, 0, 64, 64);
