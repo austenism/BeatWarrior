@@ -429,7 +429,7 @@ namespace Gaming
             spriteBatch.Draw(barTexture, new Vector2(64 + 8, 856), Color.White);
             spriteBatch.Draw(barTexture, new Vector2(64 + 8 + 4 + 256, 856), Color.White);
 
-
+            spriteBatch.Draw(Key, new Vector2(670, 0), Color.White);
 
             //spriteBatch.Draw(playerTexture, position, source, Color.White, 0, Vector2.Zero, 1f, SpriteEffects.FlipHorizontally, 0);
             for(int ind = 0; ind < 8; ind++)
