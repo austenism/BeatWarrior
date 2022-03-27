@@ -201,7 +201,8 @@ namespace Gaming
                     curFacing = Facing.Down;
                     if (Position.Y < 11 && !ObstacleDown)
                     {
-                        //canMove = false;
+                        movedThisBeat = true;
+                        canMove = false;
                         movingDown = true;
                     }
                 }
@@ -211,7 +212,8 @@ namespace Gaming
                     curFacing = Facing.Left;
                     if (Position.X > 0 && !ObstacleLeft)
                     {
-                        //canMove = false;
+                        movedThisBeat = true;
+                        canMove = false;
                         movingLeft = true;
                     }
                 }
@@ -221,7 +223,8 @@ namespace Gaming
                     curFacing = Facing.Up;
                     if (Position.Y > 0 && !ObstacleUp)
                     {
-                        //canMove = false;
+                        movedThisBeat = true;
+                        canMove = false;
                         movingUp = true;
                     }
                 }
@@ -234,9 +237,9 @@ namespace Gaming
 
                 int facingModified = (((((int)curFacing + 1) / 2) % 2) * 2) - 1;
 
-                int deltaX = facingModified * (int)curFacing % 2;
-                int deltaY = facingModified * ((int)curFacing + 1) % 2;
-                if (movedThisBeat)
+                int deltaX = (facingModified * (int)curFacing % 2) * -1;
+                int deltaY = (facingModified * ((int)curFacing + 1) % 2) * -1;
+                if (movedThisBeat || attackedThisBeat)
                 {
                     switch (Measure[beat])
                     {
@@ -244,13 +247,13 @@ namespace Gaming
                             //take stamia
                             break;
                         case Actions.Move:
-                            Position.X -= deltaX;
-                            Position.Y -= deltaY;
+                            Position.X += deltaX;
+                            Position.Y += deltaY;
                             break;
                         case Actions.Attack:
                             AttackedSquare = Position;
-                            AttackedSquare.X -= deltaX;
-                            AttackedSquare.Y -= deltaY;
+                            AttackedSquare.X += deltaX;
+                            AttackedSquare.Y += deltaY;
                             break;
                         default:
                             //also take stamina bc "why"
