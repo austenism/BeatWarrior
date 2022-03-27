@@ -18,7 +18,7 @@ namespace Gaming.GameLoops
         List<Soup> soupsToRemove = new List<Soup>();
         public override void LoadContent()
         {
-            backgroundMusic = Content.Load<SoundEffect>("FillerLevelContent/moosic");
+            backgroundMusic = Content.Load<SoundEffect>("FillerLevelContent/ootsidemoosic");
             SongLength = 8;
 
             _tiledMap = Content.Load<TiledMap>("FillerLevelContent/fillerTileMap");
@@ -61,13 +61,13 @@ namespace Gaming.GameLoops
                 s.LoadContent(Content);
             }
         }
-        public override void Update(GameTime gameTime)
+        public override bool Update(GameTime gameTime)
         {
             SongTimer -= (float)gameTime.ElapsedGameTime.TotalSeconds;
             if(SongTimer <= 0)
             {
                 SongTimer = SongLength;
-                //backgroundMusic.Play();
+                backgroundMusic.Play();
             }
 
             _tiledMapRenderer.Update(gameTime);
@@ -191,6 +191,15 @@ namespace Gaming.GameLoops
                 soups.Remove(s);
             }
             #endregion
+
+            if(soups.Count == 0)
+            {
+                return true;
+            }
+            else
+            {
+                return false;
+            }
         }
         public override void Draw(GameTime gameTime, SpriteBatch spriteBatch)
         {

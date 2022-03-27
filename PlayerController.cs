@@ -392,6 +392,8 @@ namespace Gaming
             #endregion
             spriteBatch.Draw(barTexture, new Vector2(64 + 8, 856), Color.White);
 
+
+
             //spriteBatch.Draw(playerTexture, position, source, Color.White, 0, Vector2.Zero, 1f, SpriteEffects.FlipHorizontally, 0);
             for(int ind = 0; ind < 4; ind++)
             {
