@@ -34,6 +34,10 @@ namespace Gaming
         private Texture2D trackerTexture;
         private Texture2D movingTexture;
         private Texture2D attackedTexture;
+        private Texture2D reticleTexture;
+
+        int deltaX = 0;
+        int deltaY = 0;
 
         private KeyboardState currentKeyboardState;
         private KeyboardState priorKeyboardState;
@@ -106,6 +110,7 @@ namespace Gaming
             trackerTexture = Content.Load<Texture2D>("BarStuff/BeatTracker");
             movingTexture = Content.Load<Texture2D>("BarStuff/MoveSlots");
             attackedTexture = Content.Load<Texture2D>("BarStuff/AttackSlots");
+            reticleTexture = Content.Load<Texture2D>("crosshair");
         }
         public void Update(GameTime gameTime)
         {
@@ -237,8 +242,8 @@ namespace Gaming
 
                 int facingModified = (((((int)curFacing + 1) / 2) % 2) * 2) - 1;
 
-                int deltaX = (facingModified * (int)curFacing % 2) * -1;
-                int deltaY = (facingModified * ((int)curFacing + 1) % 2) * -1;
+                deltaX = (facingModified * (int)curFacing % 2) * -1;
+                deltaY = (facingModified * ((int)curFacing + 1) % 2) * -1;
                 if (movedThisBeat || attackedThisBeat)
                 {
                     switch (Measure[beat])
@@ -333,6 +338,8 @@ namespace Gaming
                     red = false;
                 }
             }
+            spriteBatch.Draw(reticleTexture, new Vector2((((deltaX + Position.X) * 64) + Constants.BORDERSIZE), (((deltaY + Position.Y) * 64) + Constants.BORDERSIZE)),
+                null, Color.White, 0, Vector2.Zero, 1f, SpriteEffects.None, 0);
             #endregion
             #region DrawHearts
             Rectangle fullHeart = new Rectangle(0, 0, 64, 64);
