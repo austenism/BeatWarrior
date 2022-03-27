@@ -218,6 +218,10 @@ namespace Gaming.GameLoops
             {
                 s.Update(gameTime);
             }
+            foreach(Brick b in Bricks)
+            {
+                b.Update(gameTime);
+            }
             #region CheckCollisions
             foreach (Soup s in soups)
             {

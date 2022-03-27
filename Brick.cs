@@ -21,10 +21,10 @@ namespace Gaming
         private static int BPM = 120;
         private float delay = 60 / (float)BPM;
 
-        int facingModified;
+        public int facingModified;
 
-        int deltaX;
-        int deltaY;
+        public int deltaX;
+        public int deltaY;
 
         public int animationFrame = 0;
         public bool Hurty = true;
@@ -46,22 +46,28 @@ namespace Gaming
 
             LoadContent();
         }
-
+        
         public void LoadContent()
         {
             texture = Content.Load<Texture2D>("BrickAttackParticle");
         }
         public void Update(GameTime gameTime)
         {
+            #region PositionCalculation
+            //update positions relative to grid and stuff
+                position.X = (Position.X * 64) + Constants.BORDERSIZE;
+                position.Y = (Position.Y * 64) + Constants.BORDERSIZE;
+            #endregion
+            int modifiedfacing = (((((int)direction + 1) / 2) % 2) * 2) - 1;
             delay -= (float)gameTime.ElapsedGameTime.TotalSeconds;
             if (delay <= 0)
             {
                 delay = 60 / (float)BPM;
 
-                Position.X += deltaX;
-                Position.Y += deltaY;
+                Position.X += (facingModified * (int)direction % 2) * -1;
+                Position.Y += (facingModified * ((int)direction + 1) % 2) * -1;
             }
-            animationFrame = ((int)delay / 15) % 4;
+            animationFrame = (int)(delay /0.125) % 4;
         }
         public void Draw(GameTime gameTime, SpriteBatch spriteBatch)
         {
